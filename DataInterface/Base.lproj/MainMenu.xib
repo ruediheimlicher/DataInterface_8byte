@@ -753,7 +753,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="1187" height="706"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="1187" height="706"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -796,7 +796,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pHu-KQ-XEA">
-                                            <rect key="frame" x="400" y="57" width="377" height="313"/>
+                                            <rect key="frame" x="400" y="52" width="377" height="313"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="HyJ-Zy-x3T">
                                                 <rect key="frame" x="1" y="1" width="375" height="296"/>
@@ -818,7 +818,7 @@
                                             </scroller>
                                         </scrollView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOO-Sk-Lc4" customClass="Abszisse" customModule="DataInterface" customModuleProvider="target">
-                                            <rect key="frame" x="339" y="73" width="62" height="297"/>
+                                            <rect key="frame" x="339" y="68" width="62" height="297"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rF4-b9-oeL">
@@ -1078,7 +1078,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="PPt-JN-Hgi">
                                                 <rect key="frame" x="1" y="1" width="280" height="94"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uVA-nE-g4w" customClass="NSTextView">
                                                         <rect key="frame" x="0.0" y="0.0" width="277" height="91"/>
@@ -1091,7 +1091,7 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="YKn-Qt-gE7">
-                                                <rect key="frame" x="281" y="1" width="15" height="94"/>
+                                                <rect key="frame" x="1" y="1" width="15" height="0.0"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>

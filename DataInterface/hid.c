@@ -441,6 +441,7 @@ static void hid_close(hid_t *hid)
 	IOHIDDeviceUnscheduleFromRunLoop(hid->ref, CFRunLoopGetCurrent( ), kCFRunLoopDefaultMode);
 	IOHIDDeviceClose(hid->ref, kIOHIDOptionsTypeNone);
 	hid->ref = NULL;
+   
 }
 
 
@@ -508,7 +509,7 @@ static void input_callback(void *context, IOReturn ret, void *sender,
    buffer_t *n;
    hid_t *hid;
    
-//   fprintf(stderr,"input_callback ret: %d\n",ret);
+   //fprintf(stderr,"input_callback ret: %d\n",ret);
    if (ret != kIOReturnSuccess || len < 1)
    {
       fprintf(stderr,"input_callback err\n");

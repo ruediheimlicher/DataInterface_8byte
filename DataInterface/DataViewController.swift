@@ -58,6 +58,8 @@ let TAKT_HI_BYTE = 15
 let DATACOUNT_LO    =   12 // Messung, laufende Nummer
 let DATACOUNT_HI    =   13
 
+let STARTMINUTELO_BYTE = 5
+let STARTMINUTEHI_BYTE = 6
 
 let DATA_START_BYTE   = 15    // erstes byte fuer Data
 
@@ -301,7 +303,18 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    } // writeData
    
    
-   
+   func tagminute()-> Int
+   {
+      let date = Date()
+      let calendar = Calendar.current
+      let formatter = DateFormatter()
+      formatter.locale = Locale(identifier: "gsw-CH")
+      
+      let stunde = calendar.component(.hour, from: date)
+      let minute = calendar.component(.minute, from: date)
+      return 60 * stunde + minute
+   }
+
    
    func tagsekunde()-> Int
    {
@@ -365,6 +378,14 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       formatter.dateFormat = "yyMMdd_HHmm"
       let prefixString = formatter.string(from: date)
       return prefixString
+   }
+   
+   func delayWithSeconds(_ seconds: Double, completion: @escaping () -> ())
+   {
+      DispatchQueue.main.asyncAfter(deadline: .now() + seconds)
+      {
+         completion()
+      }
    }
    
    func MessungDataString(data:[[Float]])-> String
@@ -619,17 +640,28 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          // ****************************************************************************
          //MARK: USB_STOP
       // ****************************************************************************
-      case USB_STOP:
+ 
+       case USB_STOP:
          print("code ist USB_STOP")
          
+
+         // ****************************************************************************
+         //MARK: MESSUNG_START
+         // ****************************************************************************
+      case MESSUNG_START:
+         print("code ist MESSUNG_START")
+         print(teensy.read_byteArray)
+         print("\n\(teensy.last_read_byteArray)")
+
          
+
          // ****************************************************************************
          //MARK: MESSUNG_DATA
       // ****************************************************************************
       case MESSUNG_DATA: // wird gesetzt, wenn vom Teensy im Timertakt Daten gesendet werden
-         //print("code ist MESSUNG_DATA")
-         //print(teensy.read_byteArray)
-         //print("\n\(teensy.last_read_byteArray)")
+         print("code ist MESSUNG_DATA")
+         print(teensy.read_byteArray)
+         print("\n\(teensy.last_read_byteArray)")
          let counterLO = Int32(teensy.read_byteArray[DATACOUNT_LO])
          let counterHI = Int32(teensy.read_byteArray[DATACOUNT_LO])
          
@@ -803,7 +835,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       let readerr = teensy.start_read_USB(usb_read_cont)
       if (readerr == 0)
       {
-         print("Fehler in report_start_messung")
+         print("Fehler in report_start_download_logger_USB")
       }
 
       teensy.write_byteArray[0] = UInt8(LOGGER_START)
@@ -1204,6 +1236,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          swiftArray[TaskListe.selectedRow]["task"] = 1  as AnyObject?
       }
    }
+   
+   
 
    @IBAction func report_start_messung(_ sender: NSButton)
    {
@@ -1213,6 +1247,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //print("start_messung start ")
          
          teensy.close_hid()
+         
+ 
          
          let erfolg = UInt8(teensy.USBOpen())
          if (erfolg > 0)
@@ -1226,6 +1262,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             print("start_messung error ")
          }
          
+         //http://stackoverflow.com/questions/38031137/how-to-program-a-delay-in-swift-3
+ //        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { (timer) in
+            // do stuff 1 seconds later
+ //        }
          
          MessungStartzeitFeld.integerValue = tagsekunde()
          MessungStartzeit = tagsekunde()
@@ -1247,6 +1287,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let zeit = tagsekunde()
          print("start_messung startblock: \(startblock)  zeit: \(zeit)")
          
+         let startminute = tagminute()
+         teensy.write_byteArray[STARTMINUTELO_BYTE] = UInt8(startminute & 0x00FF)
+         teensy.write_byteArray[STARTMINUTEHI_BYTE] = UInt8((startminute & 0xFF00)>>8)
+ 
+         
          Counter.intValue = 0
          
          self.datagraph.initGraphArray()
@@ -1254,13 +1299,19 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          self.datagraph.setMaxY(maxY: 100)
          self.datagraph.setDisplayRect()
 
+         usb_read_cont = (cont_read_check.state == 1) // cont_Read wird bei aktiviertem check eingeschaltet
          
-         let readerr = teensy.start_read_USB(usb_read_cont)
-         if (readerr == 0)
+         teensy.write_byteArray[0] = UInt8(MESSUNG_START)
+         delayWithSeconds(1)
          {
-            print("Fehler in report_start_messung")
+            //Do something
+            
+            let readerr = self.teensy.start_read_USB(true)
+            if (readerr == 0)
+            {
+               print("Fehler in report_start_messung")
+            }
          }
-
          DiagrammDataArray.removeAll()
          inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
 
@@ -1366,7 +1417,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       {
          var timer : Timer? = nil
          timer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(DataViewController.cont_write_USB(_:)), userInfo: nil, repeats: true)
+         // http://stackoverflow.com/questions/38031137/how-to-program-a-delay-in-swift-3
+         RunLoop.current.add(timer!, forMode: .commonModes)
+
       }
+
    }
    
    func cont_write_USB(_ timer: Timer)
