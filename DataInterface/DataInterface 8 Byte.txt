@@ -1,0 +1,12 @@
+//
+//  DataInterface 8 Byte
+//  Text
+//  ----------------------------------
+//  Developed with embedXcode
+//
+//  Project 	DataInterface
+//  Created by 	Ruedi Heimlicher on 05.01.2017
+//  Copyright 	© 2017 Ruedi Heimlicher
+//  License	<#license#>
+//
+
