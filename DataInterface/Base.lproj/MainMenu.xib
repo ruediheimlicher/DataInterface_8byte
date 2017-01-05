@@ -1135,10 +1135,10 @@
                         <buttonCell key="cell" type="push" title="Start Read USB" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lEz-jd-umy">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
-                            <connections>
-                                <action selector="start_read_USB:" target="9Ve-yB-YH6" id="wLg-ZW-KAY"/>
-                            </connections>
                         </buttonCell>
+                        <connections>
+                            <action selector="report_start_read_USB:" target="9Ve-yB-YH6" id="eAa-dG-Xxb"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GUA-dv-PgH">
                         <rect key="frame" x="22" y="582" width="133" height="32"/>
