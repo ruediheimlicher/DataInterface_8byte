@@ -364,7 +364,7 @@ open class usb_teensy: NSObject
       //write_byteArray[6] = 43;
       //write_byteArray[7] = 44;
 
-      print("\nusb.swift  write_byteArray in start_write_USB code: \(write_byteArray[0])\nSettings: ", terminator: "\n")
+      print("\nusb.swift  write_byteArray in start_write_USB code: \(write_byteArray[0])\nusb-header: ", terminator: "\n")
       var i=0;
       
       i = 0 // 16, beginn Data in USB-Buffer
