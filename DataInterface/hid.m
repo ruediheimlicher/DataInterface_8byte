@@ -22,6 +22,7 @@
 static IONotificationPortRef    gNotifyPort;
 static io_iterator_t             gAddedIter;
 
+typedef void (*callback_t)(void);
 
 
 // a list of all opened HID devices, so the caller can
@@ -50,6 +51,8 @@ const int BufferSize()
 {
    return BUFFER_SIZE;
 }
+
+
 
 int hid_usbstatus=0;
 int rawhid_recv(int num, void *buf, int len, int timeout);
