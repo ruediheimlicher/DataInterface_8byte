@@ -185,7 +185,7 @@ static let minorrasterhorizontal = 10
             let neuerGraph = CGMutablePath()
             if (GraphArray[i].isEmpty) // letzter Punkt ist leer, Anfang eines neuen Linienabschnitts
             {
-               Swift.print("GraphArray  von \(i) ist noch Empty")
+               //Swift.print("GraphArray  von \(i) ist noch Empty")
                //neuerPunkt.x = Vorgaben.DiagrammEcke.x
                
                GraphArray[i].move(to: neuerPunkt)
@@ -593,30 +593,34 @@ extension DataPlot
          //context?.beginPath()
          context?.drawPath(using: .stroke)
          
-         let wert = lastdata?[String(i)]
- //        Swift.print("diagramm lastdatax: \(lastdatax!)")
-
-         //         Swift.print("i: \(i) qlastx: \(qlastx) qlasty: \(qlasty) wert: \(wert)\n")
-         
-         //https://www.hackingwithswift.com/example-code/core-graphics/how-to-draw-a-text-string-using-core-graphics
-         let p = GraphArray[i].currentPoint
-         //Swift.print("diagramm p x: \(p.x)")
-         
-         //         Swift.print("qlastx: \(qlastx)  DatenDicArray: \n\(DatenDicArray)")
-         //         let a = DatenDicArray.filter{$0["x"] == qlasty}
-         //         Swift.print("a: \(a)")
-         //let lasty = DatenArray.last?[i+1]
-         
-         //let labelfarbe = CGColor.init(red:1.0,green: 1.0, blue: 0.0,alpha:1.0)
-         let labelfarbe = NSColor.init(red:0.5,green: 0.8, blue: 0.5,alpha:1.0)
-         let tempWertString = String(format: "%2.1f",  wert!)
-         //         Swift.print("i: \(i) p.y: \(p.y) wert: \(wert) tempWertString: \(tempWertString) DatenArray.last: \(DatenArray.last)")
-         let paragraphStyle = NSMutableParagraphStyle()
-         paragraphStyle.alignment = .left
-         
-         let attrs = [NSFontAttributeName: NSFont(name: "HelveticaNeue", size: 10)!, NSParagraphStyleAttributeName: paragraphStyle ,NSForegroundColorAttributeName: DatafarbeArray[i]]
-         tempWertString.draw(with: CGRect(x: p.x + 4, y: p.y-6, width: 40, height: 14), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
-         
+         if let wert = lastdata?[String(i)]
+         {
+            
+            
+            //        Swift.print("diagramm lastdatax: \(lastdatax!)")
+            
+            //         Swift.print("i: \(i) qlastx: \(qlastx) qlasty: \(qlasty) wert: \(wert)\n")
+            
+            //https://www.hackingwithswift.com/example-code/core-graphics/how-to-draw-a-text-string-using-core-graphics
+            let p = GraphArray[i].currentPoint
+            //Swift.print("diagramm p x: \(p.x)")
+            
+            //         Swift.print("qlastx: \(qlastx)  DatenDicArray: \n\(DatenDicArray)")
+            //         let a = DatenDicArray.filter{$0["x"] == qlasty}
+            //         Swift.print("a: \(a)")
+            //let lasty = DatenArray.last?[i+1]
+            
+            //let labelfarbe = CGColor.init(red:1.0,green: 1.0, blue: 0.0,alpha:1.0)
+            let labelfarbe = NSColor.init(red:0.5,green: 0.8, blue: 0.5,alpha:1.0)
+            
+            let tempWertString = String(format: "%2.1f",  wert)
+            //         Swift.print("i: \(i) p.y: \(p.y) wert: \(wert) tempWertString: \(tempWertString) DatenArray.last: \(DatenArray.last)")
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .left
+            
+            let attrs = [NSFontAttributeName: NSFont(name: "HelveticaNeue", size: 10)!, NSParagraphStyleAttributeName: paragraphStyle ,NSForegroundColorAttributeName: DatafarbeArray[i]]
+            tempWertString.draw(with: CGRect(x: p.x + 4, y: p.y-6, width: 40, height: 14), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+         }
          
       }
       

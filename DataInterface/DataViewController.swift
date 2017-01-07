@@ -496,7 +496,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          if (readerr == 0)
          {
             //print("newLoggerDataAktion LOGGER_START: OK")
-            //print("newLoggerDataAktion LOGGER_START  readerr: \(readerr)*\nraw data:\n \(teensy.last_read_byteArray)\n")
+            print("newLoggerDataAktion LOGGER_START  readerr: \(readerr)*\nraw data:\n\(teensy.last_read_byteArray)\n")
             //print("Kontrolle LOGGER_START teensy.last_read_byteArrayheader:")
             
             //for  index in 0..<HEADER_SIZE
@@ -507,7 +507,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             //print("\n")
             packetcount = 0
             cont_log_USB(paketcnt: (packetcount))
-            //inputDataFeld.string =
+            
          }
          else
          {
@@ -519,12 +519,14 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       case LOGGER_CONT:
          //print("newLoggerDataAktion logger cont: \(code)")
          let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
-         //print("\nnewLoggerDataAktion LOGGER_CONT: \(code)\t packetcount: \(packetcount)")
+         //print("\nnewLoggerDataAktion LOGGER_CONT: \(code)\n teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
          
          // gelesene Daten
          
          if (teensy.last_read_byteArray.count > 1)
          {
+            print("\nnewLoggerDataAktion LOGGER_CONT: \(code)\n teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
+
             // http://stackoverflow.com/questions/25581324/swift-how-can-string-join-work-custom-types
              var temparray = teensy.last_read_byteArray[DATA_START_BYTE...(BUFFER_SIZE-1)] // Teilarray mit Daten
             let anz = temparray.count
@@ -539,14 +541,14 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                
                var tempwert:UInt16 = a | (b << 8)
                // tempwert = a + b * 0xff
-              // print("\(tempwert)")
+               print("\(a) \(b) \(tempwert)")
                newzeilenarray.append(tempwert)
                index += 1
                if ((index > 0) && (index%8 == 0)) // neue zeile im String nach 16 Daten (8 werte)
                {
                   //   print ("\nindex: \(index) newzeilenarray: \n\(newzeilenarray)")
                   let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
-                  //print ("\(index)\t\(tempstring)")
+                  print ("\(index)\t\(tempstring)")
                   inputDataFeld.string = inputDataFeld.string! + "\n" + tempstring
                   newzeilenarray.removeAll(keepingCapacity: true)
                   
@@ -557,6 +559,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             }
             
              //          print ("\nnewzeilenarray: \n\(newzeilenarray)")
+            
+            
             // http://useyourloaf.com/blog/swift-guide-to-map-filter-reduce/
             
             //            let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
@@ -715,6 +719,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("code ist MESSUNG_START")
          print("teensy.read_byteArray")
          print("\n\(teensy.read_byteArray)")
+         blockcounter.intValue = 0
          
       // ****************************************************************************
       // MARK: MESSUNG_DATA
@@ -920,19 +925,14 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       downloadblocknummer = 0
       teensy.write_byteArray[DOWNLOADBLOCKNUMMER_BYTE] = UInt8(downloadblocknummer & 0x00FF)
 
-      /*
-       teensy.write_byteArray[3] =  UInt8(blockcount  & 0x00FF)
-       teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
-       */
       packetcount=0
-      // old
-      //teensy.write_byteArray[3] = packetcount // beginn bei Paket 0
       
       teensy.write_byteArray[PACKETCOUNT_BYTE] = packetcount // beginn bei Paket 0
 
       // cont write aktivieren
       cont_write_check.state = 1
-      
+      //print("\nreport start download: teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
+
       var senderfolg = teensy.start_write_USB()
       //inputDataFeld.string = inputDataFeld.string! + "\nBlock: " + String(startblock) + "\n"
       inputDataFeld.string = "Block: " + String(startblock) + "\n"
@@ -1356,9 +1356,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
  //        }
          
          //teensy.write_byteArray.removeAll(keepingCapacity: true)
-         for var zeile in teensy.write_byteArray
+         //teensy.read_byteArray.removeAll(keepingCapacity: true)
+         for var zeile in teensy.read_byteArray
          {
-            //zeile = 0
+            zeile = 0
          }
          MessungStartzeitFeld.integerValue = tagsekunde()
          MessungStartzeit = tagsekunde()
@@ -1378,7 +1379,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
          teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
          
-         print("block lo: \(teensy.write_byteArray[BLOCKOFFSETLO_BYTE]) hi: \(teensy.write_byteArray[BLOCKOFFSETHI_BYTE])")
+         //print("block lo: \(teensy.write_byteArray[BLOCKOFFSETLO_BYTE]) hi: \(teensy.write_byteArray[BLOCKOFFSETHI_BYTE])")
          
          
          let zeit = tagsekunde()
@@ -1387,20 +1388,21 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let startminute = tagminute()
          teensy.write_byteArray[STARTMINUTELO_BYTE] = UInt8(startminute & 0x00FF)
          teensy.write_byteArray[STARTMINUTEHI_BYTE] = UInt8((startminute & 0xFF00)>>8)
- 
-         
-         Counter.intValue = 0
-         
-         self.datagraph.initGraphArray()
-         self.datagraph.setStartsekunde(startsekunde:tagsekunde())
-         self.datagraph.setMaxY(maxY: 100)
-         self.datagraph.setDisplayRect()
+         print("\nreport start messungT: teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
 
-         usb_read_cont = (cont_read_check.state == 1) // cont_Read wird bei aktiviertem check eingeschaltet
-         
-         teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          delayWithSeconds(1)
          {
+            
+            self.Counter.intValue = 0
+            
+            self.datagraph.initGraphArray()
+            self.datagraph.setStartsekunde(startsekunde:self.tagsekunde())
+            self.datagraph.setMaxY(maxY: 100)
+            self.datagraph.setDisplayRect()
+            
+            self.usb_read_cont = (self.cont_read_check.state == 1) // cont_Read wird bei aktiviertem check eingeschaltet
+            
+            self.teensy.write_byteArray[0] = UInt8(MESSUNG_START)
             //Do something
             
             let readerr = self.teensy.start_read_USB(true)
@@ -1426,7 +1428,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          usb_read_cont = false
          cont_read_check.state = 0;
          
-         print("DiagrammDataArray: \(DiagrammDataArray)")
+         //print("DiagrammDataArray: \(DiagrammDataArray)")
          
          var messungstring:String = MessungDataString(data:DiagrammDataArray)
          

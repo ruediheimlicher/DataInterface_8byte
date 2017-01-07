@@ -793,7 +793,7 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Task" identifier="1" id="ST4-bZ-CJm">
-                                <view key="view" id="Tyj-PD-3uq">
+                                <view key="view" ambiguous="YES" id="Tyj-PD-3uq">
                                     <rect key="frame" x="10" y="33" width="939" height="403"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1067,7 +1067,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Download" identifier="2" id="2nY-0q-qHQ">
-                                <view key="view" ambiguous="YES" id="nDd-RW-6GX">
+                                <view key="view" id="nDd-RW-6GX">
                                     <rect key="frame" x="10" y="33" width="939" height="403"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
