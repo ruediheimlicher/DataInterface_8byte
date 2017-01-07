@@ -302,7 +302,7 @@ int rawhid_send(int num, void *buf, int len, int timeout)
 		}
 	}
 #endif
-   fprintf(stderr,"rawhid_send function result: %d\n",result);
+   //fprintf(stderr,"rawhid_send function result: %d\n",result);
    free ((void*)reportData);
 	return result;
 }

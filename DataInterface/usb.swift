@@ -420,16 +420,18 @@ open class usb_teensy: NSObject
       
       //write_byteArray[PACKETCOUNT_BYTE] = packetcount
       
-      print("*** cont_write_USB packetcount: \(write_byteArray[PACKETCOUNT_BYTE])\n\twrite_byteArray: ", terminator: "")
+//      print("*** cont_write_USB packetcount: \(write_byteArray[PACKETCOUNT_BYTE])\n\twrite_byteArray: ", terminator: "")
       var i=0;
       
       //for  i in 0...63
-      while i < 32
+      /*
+      while i < 64
       {
          print(" \(write_byteArray[i])", terminator: "")
          i = i+1
       }
       print("")
+       */
 //print("a")
       
       let senderfolg = rawhid_send(0,&write_byteArray, Int32(BUFFER_SIZE), 500)
