@@ -203,7 +203,7 @@ open class usb_teensy: NSObject
          {
             last_read_byteArray = read_byteArray
             new_Data = true
-            datatruecounter += 1
+            datatruecounter = datatruecounter + 1
             let codehex = read_byteArray[0]
             let codehexstring = String(format:"%2X", codehex)
   //          print("+++\t\tnewData in usb.swift cont_Read code: \(read_byteArray[0]) \(codehexstring)")
@@ -239,7 +239,7 @@ open class usb_teensy: NSObject
          else
          {
             //new_Data = false
-            datafalsecounter += 1
+            datafalsecounter = datafalsecounter + 1
             //print("--- \(read_byteArray[0])\t\(datafalsecounter)")
          }
          //println("*read_USB in Timer result: \(result)")
@@ -280,7 +280,7 @@ open class usb_teensy: NSObject
 //      write_byteArray[4] = usb_count // byte ist besetzt
       if (usb_count < 0xFF)
       {
-      usb_count += 1
+      usb_count = usb_count + 1
       }
       else
       {
