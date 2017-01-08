@@ -51,7 +51,7 @@ class DataPlot: NSView
       static var MinY: CGFloat = 0.0                              // Untere Grenze der Anzeige
       static var MaxX: CGFloat = 1000                             // Obere Grenze der Abszisse
 
-      static var ZeitKompression: CGFloat = 1.0
+      static var ZeitKompression: CGFloat = 0.1
       static var Startsekunde: Int = 0
       static let NullpunktY: CGFloat = 0.0
       static let NullpunktX: CGFloat = 0.0
@@ -84,20 +84,64 @@ static let minorrasterhorizontal = 10
       diagrammfeld = DiagrammRect(rect:  self.bounds)
       
    }
-
+   
+   
+   open func diagrammDataDicFromLoggerData(loggerdata:String) ->[[String:CGFloat]]
+   {
+      var LoggerDataDicArray :[[String:CGFloat]]! = [[:]]
+      //Swift.print("diagrammDataDicFromLoggerData\n")
+      let loggerdataArray = loggerdata.components(separatedBy: "\n")
+      //Swift.print(loggerdataArray)
+      var index = 0
+      for datazeile in loggerdataArray
+      {
+         var tempDatenDic = [String:CGFloat]() //=  [CGFloat](repeating:0.0,count:8)
+         let zeilenarray = datazeile.components(separatedBy: "\t")
+         
+         if (zeilenarray.count == 8)
+         {
+            tempDatenDic["rawx"] = CGFloat(index)
+            var kol = 0 // kolonne
+            for kolonnenwert in zeilenarray
+            {
+               let kolonnenfloat = (kolonnenwert as NSString).floatValue
+               tempDatenDic["rawy\(kol)"] = CGFloat(kolonnenfloat)
+               kol = kol + 1
+            }
+            LoggerDataDicArray.append(tempDatenDic)
+            
+            Swift.print(tempDatenDic)
+            index = index + 1
+         }
+         
+      }
+      //Swift.print("result:\n\(LoggerDataDicArray)")
+      if (LoggerDataDicArray[0] == [:])
+      {
+         LoggerDataDicArray.remove(at: 0)
+      }
+      return LoggerDataDicArray
+   }
+   
+   open func setZeitkompression(kompression:Float)
+   {
+      Vorgaben.ZeitKompression = CGFloat(kompression)
+      needsDisplay = true
+   }
 
    open func setDatafarbe(farbe:NSColor, index:Int)
    {
       DatafarbeArray[index] = farbe
    }
  
-   open func setVorgaben(vorgaben:[String:Double])
+   open func setVorgaben(vorgaben:[String:Float])
    {
       if (vorgaben["zeitkompression"] != nil)
       {
          Vorgaben.ZeitKompression = CGFloat(vorgaben["zeitkompression"]!)
       }
       Vorgaben.MajorTeileY = Int((vorgaben["MajorTeileY"])!)
+      needsDisplay = true
    }
    
    open func setStartsekunde(startsekunde:Int)
@@ -138,10 +182,15 @@ static let minorrasterhorizontal = 10
       
       //Swift.print("frame height: \(self.frame.size.height) FaktorY: \(FaktorY) ")
        var neuerPunkt:CGPoint = feld.origin
-      neuerPunkt.x += (CGFloat(werteArray[0]) - CGFloat(Vorgaben.Startsekunde))*Vorgaben.ZeitKompression * FaktorX	//	Zeit, x-Wert, erster Wert im WerteArray
+      
+      neuerPunkt.x = neuerPunkt.x + (CGFloat(werteArray[0]) - CGFloat(Vorgaben.Startsekunde))*Vorgaben.ZeitKompression * FaktorX	//	Zeit, x-Wert, erster Wert im WerteArray
 
       var tempKanalDatenDic = [String:CGFloat]() //=  [CGFloat](repeating:0.0,count:8)
+      tempKanalDatenDic["rawx"] = CGFloat(werteArray[0])
+      
+
       tempKanalDatenDic["x"] = neuerPunkt.x
+      
       for i in 0..<(werteArray.count-1) // erster Wert ist Abszisse
       {
          if (KanalArray[i] == 1)
@@ -151,17 +200,20 @@ static let minorrasterhorizontal = 10
             
             let InputZahl = CGFloat(werteArray[i+1])	// Input vom teensy, 0-255
             
+            tempKanalDatenDic["rawy\(i)"] = InputZahl // Input vom teensy, 0-255, rawy1, rawy2, ...
+
             let graphZahl = CGFloat(InputZahl - Vorgaben.MinY) * FaktorY 							// Red auf reale Diagrammhoehe
   //          Swift.print("i: \(i) InputZahl: \(InputZahl) graphZahl: \(graphZahl)")
 
             let rawWert = graphZahl * SortenFaktor
-            tempKanalDatenDic[String(i)] = InputZahl
+            tempKanalDatenDic[String(i)] = InputZahl // input mit key i
              let DiagrammWert = rawWert * AnzeigeFaktor
             //Swift.print("setWerteArray: Kanal: \(i) InputZahl:  \(InputZahl) graphZahl:  \(graphZahl) rawWert:  \(rawWert) DiagrammWert:  \(DiagrammWert)");
             FaktorArray[i] = 1/FaktorY //(Vorgaben.MaxY - Vorgaben.MinY)/(self.frame.size.height-(Geom.randoben + Geom.randunten))
-            neuerPunkt.y += DiagrammWert;
+            neuerPunkt.y = neuerPunkt.y + DiagrammWert;
             
-            tempKanalDatenDic["np\(i)"] = neuerPunkt.y
+            tempKanalDatenDic["np\(i)"] = neuerPunkt.y // ordinate mit key np1, np2 ...
+            
             //neuerPunkt.y=InputZahl;
             //NSLog(@"setWerteArray: Kanal: %d MinY: %2.2F FaktorY: %2.2f",i,MinY, FaktorY);
             
@@ -434,6 +486,7 @@ extension DataPlot
       return path
    }
    
+   
    func vertikalelinen(rect: CGRect, abszisse: CGFloat)->CGPath
    {
       
@@ -495,10 +548,22 @@ extension DataPlot
       /*
        Diagramm im Plotrect zeichnen
        */
+      
+      
       var path = CGMutablePath()
       
-      path.addRect(rect)
+      /*
+ http://stackoverflow.com/questions/15643626/scale-cgpath-to-fit-uiview
+
+      var  shape:CAShapeLayer = CAShapeLayer.layer;
+      shape.path = path;
       
+     var CGPathRef = CGPath_NGCreateCopyByScalingPathAroundCentre(CGPathRef path,
+                                                             const float 1)
+      
+    */   
+      
+      path.addRect(rect)
       // Feld fuer das Diagramm
       //  let diagrammrect = CGRect.init(x: rect.origin.x + Geom.offsetx, y: rect.origin.y + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex , height: rect.size.height - Geom.offsety - Geom.freey)
      // diagrammfeld = DiagrammRect(rect: PlotRect())
@@ -531,7 +596,7 @@ extension DataPlot
       context?.setLineWidth(0.4)
       context?.addPath(achsenpath)
       
-      var horizontalelinenfeld = self.diagrammfeld
+      let horizontalelinenfeld = self.diagrammfeld
       let horizontalelinenpfad = horizontalelinen(rect:horizontalelinenfeld)
       
       context?.addPath(horizontalelinenpfad)
@@ -782,13 +847,13 @@ class Abszisse: DataPlot
          var subposy = posy // aktuelle Position
          for _ in 1..<(Vorgaben.MinorTeileY)
          {
-            subposy += subdistanz
+            subposy = subposy + subdistanz
             path.move(to: CGPoint(x:  abszissex, y: subposy ))
             path.addLine(to: CGPoint(x:abszissex - submark,y: subposy))
             
          }
          
-         posy += markdistanz
+         posy = posy + markdistanz
          //posy = rect.origin.y + CGFloat(pos) * markdistanz
          path.move(to: CGPoint(x:  abszissex, y: posy))
          

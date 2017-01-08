@@ -215,6 +215,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    // Einstellungen
    @IBOutlet  var IntervallPop: NSComboBox!
+   @IBOutlet  var ZeitkompressionPop: NSComboBox!
+   
    @IBOutlet   var TaskListe: NSTableView!
    @IBOutlet  var Set_Settings: NSButton!
    
@@ -543,7 +545,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                // tempwert = a + b * 0xff
                print("\(a) \(b) \(tempwert)")
                newzeilenarray.append(tempwert)
-               index += 1
+               index = index + 1
                if ((index > 0) && (index%8 == 0)) // neue zeile im String nach 16 Daten (8 werte)
                {
                   //   print ("\nindex: \(index) newzeilenarray: \n\(newzeilenarray)")
@@ -592,7 +594,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          }
          else
          {
-            downloadblocknummer += 1
+            downloadblocknummer = downloadblocknummer + 1
             print("LOGGER_CONT startblock: \(startblock) downloadblocknummer: \(downloadblocknummer)")
             if (downloadblocknummer < blockcount) // noch weitere Blocks laden
             {
@@ -732,7 +734,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let counterHI = Int32(teensy.read_byteArray[DATACOUNT_HI])
          
          let counter = (counterLO & 0x00FF) | ((counterHI & 0xFF00)>>8)
-         print("counter:\t\(counter)")
+         //print("counter:\t\(counter)")
          Counter.intValue = counter
          
          messungcounter.intValue = counter
@@ -768,7 +770,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let nrstring = String(messungnummer )
          _ = NumberFormatter()
          
-         print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
+         //print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
          ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
          
          //loggerDataArray.append([UInt8(ADC0LO)]);
@@ -1251,6 +1253,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       //Intervall lesen
       let selectedItem = IntervallPop.indexOfSelectedItem
       let intervallwert = IntervallPop .intValue
+      
       // Taktintervall in array einsetzen
       teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(intervallwert & 0x00FF)
       teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((intervallwert & 0xFF00)>>8)
@@ -1258,6 +1261,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       // Abschnitt auf SD
       teensy.write_byteArray[ABSCHNITT_BYTE] = 0
       
+      // Zeitkompression setzen
+      let selectedKomp = ZeitkompressionPop.indexOfSelectedItem
+      let kompressionwertwert = ZeitkompressionPop .intValue
+      let kompvorgabe = ["zeitkompression":Float(kompressionwertwert)]
+      datagraph.setVorgaben(vorgaben:kompvorgabe)
       
       //Angabe zum  Startblock lesen. default ist 0
       startblock = UInt16(write_sd_startblock.integerValue)
@@ -1325,7 +1333,12 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
    }
    
-   
+    @IBAction func report_zeitkompression(_ sender: NSComboBox)
+    {
+      let kompvorgabe:Float = sender.floatValue
+      datagraph.setZeitkompression(kompression:kompvorgabe)
+
+   }
 
    @IBAction func report_start_messung(_ sender: NSButton)
    {
@@ -1707,7 +1720,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
    
    
-   @IBAction func SaveResBut(sender: AnyObject)
+   @IBAction func reportSaveMessung(sender: AnyObject)
    {
       // https://eclecticlight.co/2016/12/23/more-fun-scripting-with-swift-and-xcode-alerts-and-file-save/
       var fileContentToWrite:String = (inputDataFeld.string)!
@@ -1715,10 +1728,16 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       {
          fileContentToWrite = "empty file"
       }
-      //and so on to build the text to be written out to the file
+      // http://stackoverflow.com/questions/36436964/setting-initial-directory-for-nsopenpanel
       let FS = NSSavePanel()
       FS.canCreateDirectories = true
       FS.allowedFileTypes = ["txt"]
+      FS.title = "Messung sichern"
+      FS.nameFieldLabel = "Messung:"
+      FS.nameFieldStringValue = datumprefix() + "_data"
+      let messungPfad = "~/Documents/LoggerdataDir/Messungen" as NSString
+      let messungURL = NSURL.fileURL(withPath: messungPfad.expandingTildeInPath , isDirectory: true)
+      FS.directoryURL = messungURL
       //which should also allow “txt”
       FS.begin { result in
          if result == NSFileHandlingPanelOKButton {
@@ -1733,4 +1752,53 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
    }
 
+   @IBAction func reportOpenData(sender: AnyObject)
+   {
+      // https://eclecticlight.co/2016/12/23/more-fun-scripting-with-swift-and-xcode-alerts-and-file-save/
+      //and so on to build the text to be written out to the file
+      let FS = NSOpenPanel()
+      FS.canCreateDirectories = true
+      FS.allowedFileTypes = ["txt"]
+      FS.title = "Messung sichern"
+      FS.nameFieldLabel = "Messung:"
+      FS.nameFieldStringValue = datumprefix() + "_data"
+      let messungPfad = "~/Documents/LoggerdataDir" as NSString
+      let messungURL = NSURL.fileURL(withPath: messungPfad.expandingTildeInPath , isDirectory: true)
+      FS.directoryURL = messungURL
+      // http://stackoverflow.com/questions/41349781/nsopenpanel-nssavepanel-crashes-in-swift-3
+      if (FS.runModal() == NSModalResponseOK)
+      {
+         let result = FS.url // Pathname of the file
+         
+         if (result != nil)
+         {
+            let path = result!.path
+            print("browseFile path: \(path)")
+            //filename_field.stringValue = path
+            do
+            {
+               let datastring = try String(contentsOf: result!, encoding: String.Encoding.utf8)
+               //print("datastring\n\(datastring)\n")
+               inputDataFeld.string = datastring
+               let loggerdataArray = datagraph.diagrammDataDicFromLoggerData(loggerdata: datastring)
+               
+               //print("loggerdataArray\n\(loggerdataArray)\n")
+            }
+            catch
+            {
+               print("Fehler beim Oeffnen an Pfad: \(path)")
+               inputDataFeld.string = "Fehler beim Oeffnen an Pfad: \(path)"
+            }
+         }
+         
+      }
+      else
+      {
+         print("User clicked on \"Cancel\"")
+         return
+      }
+
+   }
+
 }
+
