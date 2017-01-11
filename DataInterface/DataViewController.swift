@@ -80,7 +80,7 @@ let USB_STOP    = 0xAA
 
 
 
-class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate
+class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate, NSTableViewDelegate, NSTableViewDataSource
 {
    
    // Variablen
@@ -455,7 +455,44 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       USB_OK.textColor = NSColor.red
       USB_OK.stringValue = "?";
       
+      //MARK: -   TaskListe
+      TaskListe.delegate = self
+      TaskListe.dataSource = self
       
+      var tempDic = [String:AnyObject]()
+      
+      tempDic["task"] = 1  as AnyObject?
+      tempDic["description"] = "Temperatur messen"  as AnyObject?
+      tempDic["util"] = "T < 100°C"  as AnyObject?
+      
+      swiftArray.append(tempDic)
+      
+      tempDic["task"] = 0 as AnyObject?
+      tempDic["description"] = "Spannung messen"  as AnyObject?
+      tempDic["util"] = "U <= 5V"  as AnyObject?
+      
+      swiftArray.append(tempDic)
+      
+      tempDic["task"] = 0 as AnyObject?
+      tempDic["description"] = "Strom messen"  as AnyObject?
+      tempDic["util"] = "I <= 10A"  as AnyObject?
+      
+      swiftArray.append(tempDic)
+
+      
+     //MARK: -   datagraph
+      var data = datadiagramm.init(nibName: "Datadiagramm", bundle: nil)
+      self.datagraph.wantsLayer = true
+      
+      //self.datagraph.layer?.backgroundColor = CGColor.black
+      self.datagraph.setDatafarbe(farbe:NSColor.red, index:0)
+      
+      let abszissebgfarbe:NSColor  = NSColor(red: (0.0), green: (0.0), blue: (0.0), alpha: 0.0)
+      
+      self.dataAbszisse.backgroundColor_n(color:abszissebgfarbe)
+      self.dataAbszisse.setDiagrammFeldHeight(h: self.datagraph.DiagrammFeldHeight())
+      
+
 
 
    }//viewDidLoad
@@ -789,7 +826,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
          tempwerte[0] = Float(tempzeit) // Abszisse
          tempwerte[1] = Float(adcfloat)
-         //tempwerte[2] = Float(adcfloat + 10)
+         
+         tempwerte[3] = Float(adcfloat + 10)
+         
          //print("tempwerte: \(tempwerte)")
          DiagrammDataArray.append(tempwerte)
          
@@ -799,18 +838,46 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          self.datagraph.setWerteArray(werteArray:tempwerte)
          
          let PlatzRechts:Float = 20.0
+         
+         // breite des sichtbaren Bereichs
          let contentwidth = Float(self.dataScroller.contentView.bounds.size.width)
          
          // let lastdata = self.datagraph.DatenArray.last
          let lastxold = Float((self.datagraph.DatenArray.last?[0])!)
          let lastx = Float((self.datagraph.DatenDicArray.last?["x"])!)
          
+         let maxx = NSMaxX((self.dataScroller.documentView?.frame)!)
+         let maxwidth = NSWidth((self.dataScroller.documentView?.bounds)!)
+         
+         let currentScrollPosition = self.dataScroller.contentView.bounds.origin.x
+
+         
+         print("\nmaxx: \(maxx) maxwidth: \(maxwidth) \tcurrentScrollPosition: \(currentScrollPosition)")
+
+         
+         let newscrollorigin = NSMakePoint(currentScrollPosition,0.0)
+         
+         
+         //// restore the scroll location
+        // [[theScrollView documentView] scrollPoint:currentScrollPosition];
+
+         self.dataScroller.documentView?.scroll(newscrollorigin)
+         
          //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
          // documentView: The view the scroll view scrolls within its content view
-         let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
-         //         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
          
-         if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ
+         // Nullpunkt des documentview
+         let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
+         
+         print("lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
+         
+         let aktuelledocpos = lastx + docviewx
+         let grenze = (contentwidth / 10 * 8 ) + PlatzRechts
+         
+         print(" docviewx:  \(docviewx)  aktuelledocpos: \(aktuelledocpos) grenze: \(grenze)")
+         
+         
+         if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ, wenn gegen links gescrollt wurde
          {
             let delta = contentwidth / 10 * 8
             
@@ -818,6 +885,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             self.dataScroller.documentView?.frame.origin.x -=   CGFloat(delta)
             self.dataScroller.contentView.needsDisplay = true
          }
+         
          
          // end data
          
@@ -1236,6 +1304,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
   //MARK: - Konfig Messung
    @IBAction func reportSetSettings(_ sender: NSButton)
    {
+      
       print("reportSetSettings")
       print("\(swiftArray)")
       teensy.write_byteArray[0] = UInt8(LOGGER_SETTING)
@@ -1251,8 +1320,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
       teensy.write_byteArray[SAVE_SD_BYTE] = loggersettings
       //Intervall lesen
-      let selectedItem = IntervallPop.indexOfSelectedItem
-      let intervallwert = IntervallPop .intValue
+     // let selectedItem = IntervallPop.indexOfSelectedItem
+      let intervallwert = IntervallPop.intValue
       
       // Taktintervall in array einsetzen
       teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(intervallwert & 0x00FF)
@@ -1262,8 +1331,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       teensy.write_byteArray[ABSCHNITT_BYTE] = 0
       
       // Zeitkompression setzen
-      let selectedKomp = ZeitkompressionPop.indexOfSelectedItem
-      let kompressionwertwert = ZeitkompressionPop .intValue
+      //let selectedKomp = ZeitkompressionPop.indexOfSelectedItem
+      let kompressionwertwert = ZeitkompressionPop.intValue
+      
       let kompvorgabe = ["zeitkompression":Float(kompressionwertwert)]
       datagraph.setVorgaben(vorgaben:kompvorgabe)
       
@@ -1315,7 +1385,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    @IBAction func reportTaskCheck(_ sender: NSButton)
    {
-      //print("reportTaskCheck state: \(sender.state)")
+      print("reportTaskCheck state: \(sender.state)")
       //let zeile = TaskListe.selectedRow
       //var zelle = swiftArray[TaskListe.selectedRow] //as! [String:AnyObject]
       
@@ -1780,9 +1850,23 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                let datastring = try String(contentsOf: result!, encoding: String.Encoding.utf8)
                //print("datastring\n\(datastring)\n")
                inputDataFeld.string = datastring
-               let loggerdataArray = datagraph.diagrammDataDicFromLoggerData(loggerdata: datastring)
+               let loggerdataDicArray = datagraph.diagrammDataDicFromLoggerData(loggerdata: datastring)
+               let loggerDataArray = datagraph.diagrammDataArrayFromLoggerData(loggerdata: datastring)
                
-               //print("loggerdataArray\n\(loggerdataArray)\n")
+               print("reportOpenData loggerdataArray\n\(loggerDataArray)\n")
+               self.datagraph.initGraphArray()
+               //self.datagraph.setStartsekunde(startsekunde:self.tagsekunde())
+               self.datagraph.setMaxY(maxY: 100)
+          //     self.datagraph.setDisplayRect()
+
+               var index = 0
+               for zeile in loggerDataArray
+               {
+                  datagraph.setWerteArray(werteArray: zeile)
+                  index = index + 1
+                  
+               }
+               print("anzdaten: \(index)")
             }
             catch
             {
@@ -1799,6 +1883,62 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
 
    }
+   func numberOfRows(in tableView: NSTableView) -> Int
+   {
+      return self.swiftArray.count
+   }
+   func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any?
+   {
+      
+      // var tempzeile = swiftArray[row]
+      
+      guard swiftArray[row]["task"] != nil
+         else
+      {
+         return nil
+      }
+      
+      if (tableColumn?.identifier == "task")
+      {
+         //let temp = self.taskArray.object(at: row) as! NSDictionary
+         //let swifttemp = swiftArray[row] as [String:AnyObject]
+         
+         //let val:Int =   temp.value(forKey:"task") as! Int
+         // print("task val: \(val)")
+         //return (val + 1)%2
+         //return (self.taskArray.object(at: row)as! NSDictionary)["task"]
+         return swiftArray[row]["task"]
+      }
+      else if (tableColumn?.identifier == "description")
+      {
+         
+         //  return (self.taskArray.object(at: row)as! NSDictionary)["description"]
+         return swiftArray[row]["description"]
+      }
+      else if (tableColumn?.identifier == "util")
+      {
+         
+         //return (self.taskArray.object(at: row)as! NSDictionary)["util"]
+         return swiftArray[row]["util"]
+      }
+      
+      return "***"
+   }
+   
+   func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool
+   {
+      print ("shouldSelectRow row: \(row) ")
+      
+      return true
+   }
+   
+   private func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int)
+   {
+      //(self.swiftArray[row] as! NSMutableDictionary).setObject(object!, forKey: (tableColumn?.identifier)! as NSCopying)
+   }
+
+
+   // numberOfRowsInTableView: and tableView:objectValueForTableColumn:row:
 
 }
 

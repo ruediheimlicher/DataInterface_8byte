@@ -38,10 +38,10 @@
                 <outlet property="MessungStartzeitFeld" destination="CJF-Gu-QRY" id="Dxn-9l-FhZ"/>
                 <outlet property="ServoASlider" destination="5g5-S8-ZaZ" id="K6U-5A-Ecg"/>
                 <outlet property="Stop_Logger" destination="08Z-cQ-s8K" id="FzR-S1-15a"/>
-                <outlet property="TaskListe" destination="IIE-ni-E91" id="Emb-UA-19l"/>
+                <outlet property="TaskListe" destination="IIE-ni-E91" id="m1l-Fh-UOI"/>
                 <outlet property="Teensy_Status" destination="9Nz-l0-f1n" id="uWs-nS-k53"/>
                 <outlet property="USB_OK" destination="u6C-lq-lvx" id="qLS-Y4-sSY"/>
-                <outlet property="ZeitlompressionPop" destination="9R7-d2-ID3" id="Bjs-sI-sU9"/>
+                <outlet property="ZeitkompressionPop" destination="9R7-d2-ID3" id="ZFq-HT-Nkx"/>
                 <outlet property="bit0_check" destination="zUs-Cj-vcr" id="bcO-Ev-rCr"/>
                 <outlet property="bit1_check" destination="Brl-iv-yMQ" id="1XG-5Q-PrD"/>
                 <outlet property="bit2_check" destination="I6s-c2-5NF" id="cer-vf-mDS"/>
@@ -806,7 +806,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H6L-ur-bpK" customClass="DataPlot" customModule="DataInterface" customModuleProvider="target">
-                                                        <rect key="frame" x="0.0" y="0.0" width="2500" height="281"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="2500" height="280"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </subviews>
@@ -838,20 +838,21 @@
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="task" width="40" minWidth="40" maxWidth="1000" id="pv8-n3-fKs">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                            <tableColumn identifier="task" editable="NO" width="40" minWidth="40" maxWidth="1000" id="pv8-n3-fKs">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Task">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
-                                                                <buttonCell key="dataCell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" inset="2" id="xcI-TW-hOk">
+                                                                <buttonCell key="dataCell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" imageScaling="proportionallyDown" inset="2" id="xcI-TW-hOk">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                                <accessibility identifier="task"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="description" width="155" minWidth="40" maxWidth="1000" id="0GE-FH-82I">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                            <tableColumn identifier="description" editable="NO" width="155" minWidth="40" maxWidth="1000" id="0GE-FH-82I">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Description">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -862,9 +863,10 @@
                                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                                <accessibility identifier="description"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="util" width="116" minWidth="10" maxWidth="3.4028234663852886e+38" id="HXk-7y-CHN">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                            <tableColumn identifier="util" editable="NO" width="116" minWidth="10" maxWidth="3.4028234663852886e+38" id="HXk-7y-CHN">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Util">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -875,6 +877,7 @@
                                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                                <accessibility identifier="util"/>
                                                             </tableColumn>
                                                         </tableColumns>
                                                     </tableView>
@@ -1185,7 +1188,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="PPt-JN-Hgi">
                                                 <rect key="frame" x="1" y="1" width="280" height="94"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uVA-nE-g4w" customClass="NSTextView">
                                                         <rect key="frame" x="0.0" y="0.0" width="277" height="91"/>
@@ -1198,7 +1201,7 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="YKn-Qt-gE7">
-                                                <rect key="frame" x="281" y="1" width="15" height="94"/>
+                                                <rect key="frame" x="1" y="1" width="15" height="0.0"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
@@ -1472,7 +1475,7 @@
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P8z-1w-Gew">
                         <rect key="frame" x="250" y="621" width="188" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" id="vHd-dl-WAk">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" id="vHd-dl-WAk">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1948,7 +1951,7 @@
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u6C-lq-lvx">
                         <rect key="frame" x="148" y="658" width="37" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" alignment="center" id="BIr-Wc-zrM">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" id="BIr-Wc-zrM">
                             <font key="font" metaFont="system" size="18"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

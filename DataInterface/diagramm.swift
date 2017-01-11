@@ -51,7 +51,7 @@ class DataPlot: NSView
       static var MinY: CGFloat = 0.0                              // Untere Grenze der Anzeige
       static var MaxX: CGFloat = 1000                             // Obere Grenze der Abszisse
 
-      static var ZeitKompression: CGFloat = 0.1
+      static var ZeitKompression: CGFloat = 1.0
       static var Startsekunde: Int = 0
       static let NullpunktY: CGFloat = 0.0
       static let NullpunktX: CGFloat = 0.0
@@ -84,7 +84,6 @@ static let minorrasterhorizontal = 10
       diagrammfeld = DiagrammRect(rect:  self.bounds)
       
    }
-   
    
    open func diagrammDataDicFromLoggerData(loggerdata:String) ->[[String:CGFloat]]
    {
@@ -123,6 +122,81 @@ static let minorrasterhorizontal = 10
       return LoggerDataDicArray
    }
    
+   
+   open func diagrammDataArrayFromLoggerData(loggerdata:String) ->[[Float]]
+   {
+      var LoggerDataArray:[[Float]]! = [[]]
+      Swift.print("diagrammDataArrayFromLoggerData\n")
+      let loggerdataArray = loggerdata.components(separatedBy: "\n")
+      Swift.print(loggerdataArray)
+      var index = 0
+      var startsekunde:Float = 0.0
+      for datazeile in loggerdataArray
+      {
+         var tempDatenArray:[Float] = [Float](repeating:0.0,count:9)
+         let zeilenarray = datazeile.components(separatedBy: "\t")
+         
+         if (zeilenarray.count == 8) // loggerdump
+         {
+            tempDatenArray[0] = Float(index)
+            var kol = 1 // kolonne 0 ist abszisse
+            for kolonnenwert in zeilenarray
+            {
+               let kolonnenfloat = (kolonnenwert as NSString).floatValue
+               tempDatenArray[kol] = Float(kolonnenfloat)
+               kol = kol + 1
+            }
+            LoggerDataArray.append(tempDatenArray)
+            
+            Swift.print(tempDatenArray)
+            index = index + 1
+         }
+         
+         if (zeilenarray.count == 9) // messungdump
+         {
+            Swift.print("zeilenarray: \(zeilenarray)\n")
+            if (index == 0)
+            {
+               startsekunde = (zeilenarray[0] as NSString).floatValue
+               Swift.print("startsekunde: \(startsekunde)\n")
+            }
+            
+            tempDatenArray[0] = (zeilenarray[0] as NSString).floatValue// - startsekunde
+            
+            // startsekunde wegzaehlen
+            tempDatenArray[0] = tempDatenArray[0] - startsekunde
+            //var kol = 1 // kolonne 0 ist abszisse, Startsekunde wegzaehlen
+            //for kolonnenwert in zeilenarray
+            for kol in 1..<9
+            {
+               let kolonnenfloat = (zeilenarray[kol] as NSString).floatValue
+               if ((kolonnenfloat == 0.0) && (kol == 3))
+               {
+                  let wert = Float(index).truncatingRemainder(dividingBy:100)
+                  tempDatenArray[kol] = Float(index).truncatingRemainder(dividingBy:100)
+                  
+               }
+               else
+               {
+               tempDatenArray[kol] = Float(kolonnenfloat)
+               }
+            }
+            LoggerDataArray.append(tempDatenArray)
+            
+            Swift.print(tempDatenArray)
+            index = index + 1
+         }
+         
+      }
+      
+      //Swift.print("result:\n\(LoggerDataDicArray)")
+      if (LoggerDataArray[0] == [])
+      {
+         LoggerDataArray.remove(at: 0)
+      }
+      return LoggerDataArray
+   }
+   
    open func setZeitkompression(kompression:Float)
    {
       Vorgaben.ZeitKompression = CGFloat(kompression)
@@ -140,7 +214,10 @@ static let minorrasterhorizontal = 10
       {
          Vorgaben.ZeitKompression = CGFloat(vorgaben["zeitkompression"]!)
       }
-      Vorgaben.MajorTeileY = Int((vorgaben["MajorTeileY"])!)
+       if (vorgaben["MajorTeileY"] != nil)
+       {
+         Vorgaben.MajorTeileY = Int((vorgaben["MajorTeileY"])!)
+      }
       needsDisplay = true
    }
    
@@ -193,7 +270,7 @@ static let minorrasterhorizontal = 10
       
       for i in 0..<(werteArray.count-1) // erster Wert ist Abszisse
       {
-         if (KanalArray[i] == 1)
+         if (KanalArray[i] < 8)
          {
            neuerPunkt.y = feld.origin.y
 //            Swift.print("i: \(i) werteArray 0: \(werteArray[0]) neuerPunkt.x nach: \(neuerPunkt.x)")
@@ -322,7 +399,7 @@ extension DataPlot
    func setDisplayRect()
    {
       Swift.print("setDisplayRect")
-      self.setNeedsDisplay(self.bounds)
+//      self.setNeedsDisplay(self.bounds)
       
 
    }
@@ -728,6 +805,7 @@ extension DataPlot
           // let diagrammrect = CGRect.init(x: rect.origin.x + Geom.offsetx, y: rect.origin.y + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex , height: rect.size.height - Geom.offsety - Geom.freey)
       
       let diagrammrect = CGRect.init(x: rect.origin.x + Geom.offsetx, y: rect.origin.y + Geom.offsety  + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex  - Geom.randrechts  -  Geom.randlinks, height: rect.size.height - Geom.offsety - Geom.freey  - Geom.randoben - Geom.randunten)
+      
       return diagrammrect
    }
    
@@ -883,10 +961,23 @@ extension Abszisse
    
    override    func DiagrammRect(rect: CGRect) -> CGRect
    {
-      // let diagrammrect = CGRect.init(x: rect.origin.x + Geom.offsetx, y: rect.origin.y + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex , height: rect.size.height - Geom.offsety - Geom.freey)
-      
+      /*
       let diagrammrect = CGRect.init(x: rect.origin.x +  rect.size.width  , y: rect.origin.y + Geom.offsety + Geom.randunten, width: rect.size.width  , height: rect.size.height - Geom.offsety - Geom.freey)
       return diagrammrect
+      */
+      
+      let diagrammrect = CGRect.init(x: rect.origin.x +  rect.size.width  , y: rect.origin.y + Geom.offsety  + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex  - Geom.randrechts  -  Geom.randlinks, height: rect.size.height - Geom.offsety - Geom.freey  - Geom.randoben - Geom.randunten)
+
+      return diagrammrect
+      
+ 
+   
+    /*
+       // DATA_INTERFACE 5
+       let diagrammrect = CGRect.init(x: rect.origin.x + Geom.offsetx, y: rect.origin.y + Geom.offsety  + Geom.offsety, width: rect.size.width - Geom.offsetx - Geom.freex  - Geom.randrechts  -  Geom.randlinks, height: rect.size.height - Geom.offsety - Geom.freey  - Geom.randoben - Geom.randunten)
+       return diagrammrect
+      */
+   
    }
    
    
