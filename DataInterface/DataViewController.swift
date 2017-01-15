@@ -80,7 +80,7 @@ let USB_STOP    = 0xAA
 
 
 
-class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate, NSTableViewDelegate, NSTableViewDataSource
+class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate, NSTableViewDelegate, NSTableViewDataSource,NSMenuDelegate
 {
    
    // Variablen
@@ -111,6 +111,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    
    var swiftArray = [[String:AnyObject]]()
+   
+   var testArray = [[String:AnyObject]]()
    
    var teensy = usb_teensy()
 
@@ -150,6 +152,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var data1: NSTextField!
    
    @IBOutlet  var inputDataFeld: NSTextView!
+   
+    @IBOutlet  var TaskTab: NSTabView!
    
    @IBOutlet  var write_sd_startblock: NSTextField!
    @IBOutlet  var write_sd_anzahl: NSTextField!
@@ -218,6 +222,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var ZeitkompressionPop: NSComboBox!
    
    @IBOutlet   var TaskListe: NSTableView!
+   
+//    @IBOutlet   var TestListe: NSTableView!
+   
    @IBOutlet  var Set_Settings: NSButton!
    
    // USB-code
@@ -235,7 +242,17 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var mmcHIFeld: NSTextField!
    @IBOutlet  var mmcDataFeld: NSTextField!
    
-   
+   // Task
+   @IBOutlet  var Task_0: NSPopUpButton!
+   @IBOutlet  var Task_1: NSPopUpButton!
+   @IBOutlet  var Task_2: NSPopUpButton!
+   @IBOutlet  var Task_3: NSPopUpButton!
+
+   @IBOutlet  var Task_0_Check: NSButton!
+   @IBOutlet  var Task_1_Check: NSButton!
+   @IBOutlet  var Task_2_Check: NSButton!
+   @IBOutlet  var Task_3_Check: NSButton!
+
    open func writeData(name:String, data:String)
    {
       /*
@@ -428,7 +445,15 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       return datastring
    }
    
-   
+   @IBAction func myPopUpButtonWasSelected(sender:AnyObject)
+   {
+      
+      print("myPopUpButtonWasSelected")
+     // if let menuItem = sender as? NSMenuItem, mindex = find(allTheThings, menuItem.title) {
+    //     sendThatIndexIntoTheWorld(mindex)
+    //  }
+   }
+
    
    //MARK: - viewDidLoad
    override func viewDidLoad()
@@ -478,7 +503,37 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       tempDic["util"] = "I <= 10A"  as AnyObject?
       
       swiftArray.append(tempDic)
+      
+      
 
+      //MARK: -   TestListe
+      var testDic = [String:AnyObject]()
+      testDic["taskcheck"] = 0  as AnyObject?
+      testDic["description"] = "Strom messen"  as AnyObject?
+      testDic["taskwahl"] = 2  as AnyObject?
+      testArray.append(testDic)
+      
+      testDic["taskcheck"] = 1  as AnyObject?
+      testDic["description"] = "Temperatur messen"  as AnyObject?
+      testDic["taskwahl"] = 1  as AnyObject?
+      
+      testArray.append(testDic)
+ /*
+      TestListe.delegate = self
+      TestListe.dataSource = self
+      TestListe.target = self
+ */
+ var namenpop:NSPopUpButtonCell = NSPopUpButtonCell.init(textCell:"XXX", pullsDown:true)
+      
+      namenpop.removeAllItems()
+      namenpop.addItems(withTitles:["Temperatur","Strom","Spannung"])
+      let sel:Selector = #selector(DataViewController.tuWasA(_:))
+      namenpop.action = sel
+      namenpop.synchronizeTitleAndSelectedItem()
+ //     TestListe.tableColumn(withIdentifier: "taskwahl")?.dataCell = namenpop
+
+      // TestListe.reloadData()
+//      self.TestListe.reloadData()
       
      //MARK: -   datagraph
       var data = datadiagramm.init(nibName: "Datadiagramm", bundle: nil)
@@ -491,8 +546,17 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
       self.dataAbszisse.backgroundColor_n(color:abszissebgfarbe)
       self.dataAbszisse.setDiagrammFeldHeight(h: self.datagraph.DiagrammFeldHeight())
-      
 
+     
+      var tasklist:[String] = ["Temperatur","Strom","Spannung"]
+      Task_0.removeAllItems()
+      Task_0.addItems(withTitles: tasklist)
+      Task_1.removeAllItems()
+      Task_1.addItems(withTitles: tasklist)
+      Task_2.removeAllItems()
+      Task_2.addItems(withTitles: tasklist)
+      Task_3.removeAllItems()
+      Task_3.addItems(withTitles: tasklist)
 
 
    }//viewDidLoad
@@ -852,32 +916,47 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let currentScrollPosition = self.dataScroller.contentView.bounds.origin.x
 
          
-         print("\nmaxx: \(maxx) maxwidth: \(maxwidth) \tcurrentScrollPosition: \(currentScrollPosition)")
-
+ 
          
-         let newscrollorigin = NSMakePoint(currentScrollPosition,0.0)
+         let newscrollorigin = NSMakePoint(currentScrollPosition - CGFloat(lastx),0.0)
          
          
          //// restore the scroll location
         // [[theScrollView documentView] scrollPoint:currentScrollPosition];
 
-         self.dataScroller.documentView?.scroll(newscrollorigin)
+   //      self.dataScroller.documentView?.scroll(newscrollorigin)
          
+         // http://stackoverflow.com/questions/9820669/i-dont-fully-understand-scrollrecttovisible-when-im-using-contentinset
+         // https://developer.apple.com/reference/appkit/nsview/1483811-scrollrecttovisible?language=objc
+         
+         // http://stackoverflow.com/questions/35939381/programmatically-scroll-nsscrollview-to-the-right
+
+         var scrollDelta = 10.0
+         var rect:CGRect  = self.dataScroller.bounds;
+         var scrollToRect:CGRect  = rect.offsetBy(dx: CGFloat(scrollDelta), dy: 0);
+
+         self.dataScroller.documentView?.scrollToVisible(scrollToRect)
          //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
          // documentView: The view the scroll view scrolls within its content view
          
          // Nullpunkt des documentview
          let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
          
-         print("lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
          
          let aktuelledocpos = lastx + docviewx
          let grenze = (contentwidth / 10 * 8 ) + PlatzRechts
          
-         print(" docviewx:  \(docviewx)  aktuelledocpos: \(aktuelledocpos) grenze: \(grenze)")
+         //print(" docviewx:  \(docviewx)  aktuelledocpos: \(aktuelledocpos) grenze: \(grenze)")
          
+        // print("\nmaxx: \(maxx) maxwidth: \(maxwidth) \tcurrentScrollPosition: \(currentScrollPosition)")
+         if (counter == 0)
+         {
+         print("\tdocviewx:  \tlastx: \tdiff: \tcurrentScrollPosition:")
+         }
+         print("\(counter)\t\(docviewx)\t\(lastx) \t\(docviewx)\t\(lastx + docviewx)\t\(currentScrollPosition)")
+
          
-         if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ, wenn gegen links gescrollt wurde
+         if (((lastx) + docviewx ) > grenze) // docviewx ist negativ, wenn gegen links gescrollt wurde
          {
             let delta = contentwidth / 10 * 8
             
@@ -1172,6 +1251,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    @IBAction func sendStrom(_ sender: AnyObject)
    {
+      print("send strom")
       var formatter = NumberFormatter()
       var tempstrom:Double  = extstrom.doubleValue * 100
       if (tempstrom > 3000)
@@ -1226,7 +1306,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          else
          {
             print("USBfertigAktion teensy schliessen nicht OK")
-            return
+            
+            //return
          }
          NSApplication.shared().terminate(self)
          return
@@ -1383,12 +1464,31 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
    }
    
-   @IBAction func reportTaskCheck(_ sender: NSButton)
+   @IBAction func reportWahlPop(_ sender: AnyObject)
    {
-      print("reportTaskCheck state: \(sender.state)")
-      //let zeile = TaskListe.selectedRow
-      //var zelle = swiftArray[TaskListe.selectedRow] //as! [String:AnyObject]
+      print("reportWahlPop state: ")
+      let zeile = TaskListe.selectedRow
+      var zelle = swiftArray[TaskListe.selectedRow]
+      print("reportWahlPop zeile: \(zeile) zelle: \(zelle)")
+      // tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int)
+      var wahlzeile = sender.selectedRow
+      let col:NSTableColumn = TaskListe.tableColumn(withIdentifier: "wahl")!
+      let cell = TaskListe.tableColumn(withIdentifier: "wahl")!.dataCell(forRow: wahlzeile!) as? NSPopUpButtonCell
+      let itemliste = cell?.itemArray
+      let item = cell?.indexOfSelectedItem
+            // let check = zelle["task"] as! Int
+      // if (check == 0)
       
+   }
+
+
+   @IBAction func reportTaskCheck(_ sender: AnyObject)
+   {
+      print("reportTaskCheck state: ")
+      let zeile = TaskListe.selectedRow
+      var zelle = swiftArray[TaskListe.selectedRow] //as! [String:AnyObject]
+      print("reportTaskCheck zeile: \(zeile) zelle: \(zelle) task: \(zelle["task"])")
+
       // let check = zelle["task"] as! Int
       // if (check == 0)
       
@@ -1887,6 +1987,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    {
       return self.swiftArray.count
    }
+   
+   
    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any?
    {
       
@@ -1921,24 +2023,260 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //return (self.taskArray.object(at: row)as! NSDictionary)["util"]
          return swiftArray[row]["util"]
       }
-      
+      else if (tableColumn?.identifier == "wahl")
+      {
+         let wahlzelle = tableColumn?.dataCell(forRow: row) as? NSPopUpButtonCell
+         let auswahl = wahlzelle?.indexOfSelectedItem
+         
+         print("task wahl: auswahl: \(auswahl)")
+         return auswahl
+      }
+   
       return "***"
+   }
+   
+   public func tableView(tableView: NSTableView, willDisplayCell cell: NSCell, forRowAtIndexPath indexPath: NSIndexPath)
+   {
+      print("willDisplayCell pfad \(indexPath) ")
+      if let myCell = cell as? NSPopUpButtonCell
+      {
+         
+         print("willDisplayCell pfad \(indexPath) items: \(myCell.itemArray) \n \(myCell.itemTitles)")
+         //perform your code to cell
+      }
    }
    
    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool
    {
-      print ("shouldSelectRow row: \(row) ")
+      let listeident = tableView.identifier
+      if (listeident == "taskliste")
+      {
+      print ("taskliste shouldSelectRow row: \(row) ")
+      }
+      else if (listeident == "testliste")
+      {
+          print ("testliste shouldSelectRow row: \(row) ")
+      }
       
       return true
    }
    
    private func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int)
    {
-      //(self.swiftArray[row] as! NSMutableDictionary).setObject(object!, forKey: (tableColumn?.identifier)! as NSCopying)
+      let listeident = tableView.identifier
+      if (listeident == "taskliste")
+      {
+      let ident = tableColumn?.identifier
+      self.swiftArray[row][ident!] = object
+//      (self.swiftArray[row] as! NSMutableDictionary).setObject(object!, forKey: (tableColumn?.identifier)! as NSCopying)
+      }
+      else if (listeident == "testliste")
+      {
+         let ident = tableColumn?.identifier
+         self.testArray[row][ident!] = object
+
+      }
+   }
+   
+// http://stackoverflow.com/questions/36365242/cocoa-nspopupbuttoncell-not-displaying-selected-value
+
+   func numberOfRowsInTableView(tableView: NSTableView) -> Int
+   {
+      let listeident = tableView.identifier
+      print("numberOfRowsInTableView ident: \(listeident)")
+      if (listeident == "taskliste")
+      {
+      return self.swiftArray.count
+      }
+      else if (listeident == "testliste")
+      {
+          return self.testArray.count
+      }
+      return 0
+   }
+   
+   func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject?
+   {
+      let listeident = tableView.identifier
+      print("objectValueFor^TableColumn ident: \(listeident)")
+      if (listeident == "taskliste")
+      {
+      
+      let zeile = swiftArray[row]
+      print("objectValueForTableColumn zeile: \(zeile["util"])")
+      if tableColumn!.identifier == "util"
+      {
+         print("objectValueForTableColumn util: \(zeile)")
+         return zeile["util"]
+      }
+      else if tableColumn!.identifier == "wahl"
+      {
+         print("taskArray objectValueForTableColumn wahl: \(zeile["wahl"])")
+
+         let wahlzelle = tableColumn?.dataCell(forRow: row) as? NSPopUpButtonCell
+         
+         return zeile["wahl"]
+         
+        // let zelle = tableView (_, dataCellFor: tableColumn?, row: row)
+        
+        // return swiftArray.availableResolutions.indexOf(display.resolution)
+      }
+      }
+      else if (listeident == "testliste")
+      {
+         let zeile = testArray[row]
+         print("testArray objectValueForTableColumn zeile: \(zeile["util"])")
+
+      }
+      return nil
+   }
+/*
+   func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+      let display = swiftArray[row]
+      if tableColumn!.identifier == "displayCell" {
+         display.name = object as! String
+      }
+      else if tableColumn!.identifier == "resolutionCell" {
+         display.resolution = display.availableResolutions[object as! Int]
+      }
+   }
+*/
+   
+   func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
+   {
+      if let cell = tableColumn?.dataCell(forRow: row) as? NSCell
+      {
+         let listeident = tableView.identifier
+         //print("dataCellFor ident: \(listeident)")
+         if (listeident == "taskliste")
+         {
+            
+            if tableColumn!.identifier == "wahl"
+            {
+               if let popupButtonCell = cell as? NSPopUpButtonCell
+               {
+                  
+                  
+                  popupButtonCell.removeAllItems()
+                  popupButtonCell.addItems(withTitles:["Temperatur","Strom","Spannung"])
+                  popupButtonCell.synchronizeTitleAndSelectedItem()
+                  
+               }
+            }
+         }
+         else if (listeident == "testliste")
+         {
+            if tableColumn!.identifier == "taskwahl"
+            {
+               //print("dataCellFor taskwahl")
+               let wahlzelle = tableColumn?.dataCell(forRow:row)as! NSPopUpButtonCell
+               print("items: \(wahlzelle.itemTitles)")
+               return wahlzelle
+               
+               if let popupButtonCell = cell as? NSPopUpButtonCell
+               {
+                  
+                 // popupButtonCell.removeAllItems()
+                  popupButtonCell.addItems(withTitles:["aaa","bbb","ccc"])
+                  let sel:Selector = #selector(DataViewController.tuWasA(_:))
+                  popupButtonCell.action = sel
+                  popupButtonCell.synchronizeTitleAndSelectedItem()
+
+               }
+               
+            }
+            else if tableColumn!.identifier == "taskcheck"
+            {
+               print("dataCellFor taskcheck")
+               let wahlzelle = tableColumn?.dataCell(forRow:row)as! NSButtonCell
+               if row < testArray.count
+               {
+                  let listezeile = testArray[row]
+                  print("dataCellFor taskcheck row \(row): listezeile: \(listezeile)")
+               }
+               if wahlzelle.state == 1
+               {
+                  print("state 1")
+                  wahlzelle.state = 0
+               }
+               else
+               {
+                  print("state 0")
+                  wahlzelle.state = 1
+               }
+               return wahlzelle
+
+            }
+            
+         }
+         return cell
+      }
+      return nil
+   }
+   
+   /*
+   func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
+   {
+      
+      
+      //print ("dataCellForTableColumn  row: \(row) ")
+      if tableColumn == nil
+      {
+         //print ("nil")
+         return nil
+      }
+      let ident:String = tableColumn!.identifier
+
+      if tableColumn!.identifier != "wahl"
+      {
+         
+         return nil
+      }
+      
+      let cell = NSPopUpButtonCell()
+      cell.isBordered = false
+      
+      cell.menu!.addItem(withTitle: "Temperatur", action: nil, keyEquivalent: "")
+      cell.menu!.addItem(withTitle: "Spannung", action: nil, keyEquivalent: "")
+      cell.menu!.addItem(withTitle: "ON-OFF", action: nil, keyEquivalent: "")
+      cell.selectItem(at: 1) // <--- obviously ignored ?!
+      
+      let selektion = cell.indexOfSelectedItem
+      //print("selektion: \(selektion)")
+      
+      if (cell.menu!.title == "Temperatur")
+      {
+         print("Temperatur")
+      }
+ 
+      return cell
+   }
+*/
+   // numberOfRowsInTableView: and tableView:objectValueForTableColumn:row:
+
+   
+   /*
+   func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView?
+   {
+      
+      let result  = tableView.make(withIdentifier: tableColumn!.identifier, owner: self) //as! BPTableCell
+      
+      //result.itemField.stringValue = items[row]
+      //result.itemLabel.stringValue = labels[row]
+      
+      return result
+   }
+ */
+
+   func tuWasA(_ sender: NSMenuItem)
+   {
+      print("tuWasA")
    }
 
-
-   // numberOfRowsInTableView: and tableView:objectValueForTableColumn:row:
+   func tuWasB(_ sender: NSMenuItem)
+   {
+      print("tuWasB")
+   }
 
 }
 

@@ -579,7 +579,8 @@ extension DataPlot
       //let deltax = rect.size.height / CGFloat(Vorgaben.MajorTeileY)  * CGFloat(Vorgaben.rastervertikal)
       //var posy = rect.origin.y
       // if ((Int(abszisse) % Vorgaben.rasterhorizontal) == 0)
-      
+      if (abszisse > 0)
+      {
       for pos in Int(rect.origin.x)..<Int(abszisse)
       {
          if (pos % Vorgaben.minorrasterhorizontal == 0)
@@ -611,6 +612,7 @@ extension DataPlot
             }
          }
       }
+      }// if abszisse
       
       return path
    }
