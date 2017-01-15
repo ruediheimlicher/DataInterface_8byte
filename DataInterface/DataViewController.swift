@@ -80,8 +80,13 @@ let USB_STOP    = 0xAA
 
 
 
-class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate, NSTableViewDelegate, NSTableViewDataSource,NSMenuDelegate
+class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDelegate,NSMenuDelegate
 {
+   // von FileViewer(R. Wenderlich)
+   @IBOutlet weak var statusLabel: NSTextField!
+   var directory: Directory?
+   var directoryItems: [Metadata]?
+
    
    // Variablen
    var usbstatus: __uint8_t = 0
@@ -483,6 +488,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       //MARK: -   TaskListe
       TaskListe.delegate = self
       TaskListe.dataSource = self
+      TaskListe.target = self
       
       var tempDic = [String:AnyObject]()
       
@@ -503,6 +509,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       tempDic["util"] = "I <= 10A"  as AnyObject?
       
       swiftArray.append(tempDic)
+      TaskListe.reloadData()
       
       
 
@@ -1983,6 +1990,30 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
 
    }
+   
+   
+   func updateStatus() {
+      
+      let text: String
+      
+      let itemsSelected = TaskListe.selectedRowIndexes.count
+      
+      if (directoryItems == nil) {
+         text = "No Items"
+      }
+      else if(itemsSelected == 0) {
+         text = "\(directoryItems!.count) items"
+      }
+      else {
+         text = "\(itemsSelected) of \(directoryItems!.count) selected"
+      }
+      
+      statusLabel.stringValue = text
+   }
+   
+   
+
+   /*
    func numberOfRows(in tableView: NSTableView) -> Int
    {
       return self.swiftArray.count
@@ -2130,6 +2161,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       return nil
    }
+ */
 /*
    func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
       let display = swiftArray[row]
@@ -2141,7 +2173,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
    }
 */
-   
+ /*
    func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
    {
       if let cell = tableColumn?.dataCell(forRow: row) as? NSCell
@@ -2213,6 +2245,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       return nil
    }
+   */
    
    /*
    func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
@@ -2279,4 +2312,82 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    }
 
 }
+
+// von FileViewer
+extension DataViewController: NSTableViewDataSource
+{
+   
+   func numberOfRows(in tableView: NSTableView) -> Int
+   {
+      return swiftArray.count 
+   }
+}
+extension DataViewController: NSTableViewDelegate {
+   
+   fileprivate enum CellIdentifiers
+   {
+      static let taskCell = "task"
+      static let descriptionCell = "description"
+      static let utilCell = "util"
+      static let wahlCell = "wahl"
+   }
+   
+   func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+      
+      var image: NSImage?
+      var text: String = ""
+      var cellIdentifier: String = ""
+      
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateStyle = .long
+      dateFormatter.timeStyle = .long
+     /*
+      guard let item = swiftArray?[row] else
+      {
+         print("guard nil")
+         return nil
+      }
+      */
+      if tableColumn == tableView.tableColumns[0]
+      {
+         //image = item.icon
+         //text = item.name
+         cellIdentifier = CellIdentifiers.taskCell
+      } else if tableColumn == tableView.tableColumns[1] {
+         text = swiftArray[row][CellIdentifiers.descriptionCell] as! String
+         cellIdentifier = CellIdentifiers.descriptionCell
+      } else if tableColumn == tableView.tableColumns[2]
+      {
+          text = swiftArray[row][CellIdentifiers.utilCell] as! String
+         cellIdentifier = CellIdentifiers.utilCell
+      }
+      else if tableColumn == tableView.tableColumns[3] {
+         //text = item.isFolder ? "--" : sizeFormatter.string(fromByteCount: item.size)
+         cellIdentifier = CellIdentifiers.wahlCell
+      }
+      print("viewFor cell cellIdentifier: \(cellIdentifier)")
+      
+      if let cell = tableView.make(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView
+      {
+         print("viewFor cell ok")
+         
+         cell.textField?.stringValue = text
+        // cell.imageView?.image = image ?? nil
+         return cell
+      }
+      else
+      {
+         print("viewFor cell \(cellIdentifier) not ok")
+      }
+      return nil
+   }
+   
+   func tableViewSelectionDidChange(_ notification: Notification) {
+      updateStatus()
+   }
+   
+}
+
+
+// end fileViewer
 
