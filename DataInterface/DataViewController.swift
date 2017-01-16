@@ -481,27 +481,29 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       USB_OK.stringValue = "?";
       
       //MARK: -   TaskListe
+      /*
       TaskListe.delegate = self
       TaskListe.dataSource = self
-      
+      TaskListe.target = self
+      */
       var tempDic = [String:AnyObject]()
       
       tempDic["task"] = 1  as AnyObject?
       tempDic["description"] = "Temperatur messen"  as AnyObject?
       tempDic["util"] = "T < 100°C"  as AnyObject?
-      
+      tempDic["wahl"] = "T"  as AnyObject?
       swiftArray.append(tempDic)
       
       tempDic["task"] = 0 as AnyObject?
       tempDic["description"] = "Spannung messen"  as AnyObject?
       tempDic["util"] = "U <= 5V"  as AnyObject?
-      
+      tempDic["wahl"] = "U"  as AnyObject?
       swiftArray.append(tempDic)
       
       tempDic["task"] = 0 as AnyObject?
       tempDic["description"] = "Strom messen"  as AnyObject?
       tempDic["util"] = "I <= 10A"  as AnyObject?
-      
+      tempDic["wahl"] = "I"  as AnyObject?
       swiftArray.append(tempDic)
       
       
@@ -523,14 +525,17 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       TestListe.dataSource = self
       TestListe.target = self
  */
+      
  var namenpop:NSPopUpButtonCell = NSPopUpButtonCell.init(textCell:"XXX", pullsDown:true)
       
       namenpop.removeAllItems()
-      namenpop.addItems(withTitles:["Temperatur","Strom","Spannung"])
+      namenpop.addItems(withTitles:["Temperatur","Stromm","Spannung"])
       let sel:Selector = #selector(DataViewController.tuWasA(_:))
       namenpop.action = sel
+      namenpop.isEnabled = true
+      namenpop.autoenablesItems = true
       namenpop.synchronizeTitleAndSelectedItem()
- //     TestListe.tableColumn(withIdentifier: "taskwahl")?.dataCell = namenpop
+  //    TaskListe.tableColumn(withIdentifier: "wahl")?.dataCell = namenpop
 
       // TestListe.reloadData()
 //      self.TestListe.reloadData()
@@ -551,12 +556,20 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       var tasklist:[String] = ["Temperatur","Strom","Spannung"]
       Task_0.removeAllItems()
       Task_0.addItems(withTitles: tasklist)
+      Task_0.action = #selector(reportWahlPop(_:))
+      Task_0.target = self
       Task_1.removeAllItems()
       Task_1.addItems(withTitles: tasklist)
+      Task_1.action = #selector(reportWahlPop(_:))
+      Task_1.target = self
       Task_2.removeAllItems()
       Task_2.addItems(withTitles: tasklist)
+      Task_2.action = #selector(reportWahlPop(_:))
+      Task_2.target = self
       Task_3.removeAllItems()
       Task_3.addItems(withTitles: tasklist)
+      Task_3.action = #selector(reportWahlPop(_:))
+      Task_3.target = self
 
 
    }//viewDidLoad
@@ -1466,20 +1479,27 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    @IBAction func reportWahlPop(_ sender: AnyObject)
    {
-      print("reportWahlPop state: ")
+      print("reportWahlPop sender tag: \(sender.tag) ")
+      let zeile = (sender as! NSPopUpButton).indexOfSelectedItem
+      print("reportWahlPop sender zeile: \(zeile) ")
+      /*
       let zeile = TaskListe.selectedRow
       var zelle = swiftArray[TaskListe.selectedRow]
       print("reportWahlPop zeile: \(zeile) zelle: \(zelle)")
       // tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int)
-      var wahlzeile = sender.selectedRow
+      //var wahlzeile = sender.indexOfSelectedItem
       let col:NSTableColumn = TaskListe.tableColumn(withIdentifier: "wahl")!
-      let cell = TaskListe.tableColumn(withIdentifier: "wahl")!.dataCell(forRow: wahlzeile!) as? NSPopUpButtonCell
-      let itemliste = cell?.itemArray
-      let item = cell?.indexOfSelectedItem
+      
+      let cell = col.dataCell
+     // let itemliste = cell.itemArray
+     // let item = cell.indexOfSelectedItem
+     // let t = cell.title
             // let check = zelle["task"] as! Int
       // if (check == 0)
-      
+      */
    }
+   
+   
 
 
    @IBAction func reportTaskCheck(_ sender: AnyObject)
@@ -1985,6 +2005,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    }
    func numberOfRows(in tableView: NSTableView) -> Int
    {
+      // OK
       return self.swiftArray.count
    }
    
@@ -1999,7 +2020,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       {
          return nil
       }
-      
+      //print("objectValueFor row:\(row) ident: \(tableColumn?.identifier)")
       if (tableColumn?.identifier == "task")
       {
          //let temp = self.taskArray.object(at: row) as! NSDictionary
@@ -2028,7 +2049,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let wahlzelle = tableColumn?.dataCell(forRow: row) as? NSPopUpButtonCell
          let auswahl = wahlzelle?.indexOfSelectedItem
          
-         print("task wahl: auswahl: \(auswahl)")
+         //print("task wahl: auswahl: \(auswahl) items: \(wahlzelle?.itemTitles)")
          return auswahl
       }
    
@@ -2048,10 +2069,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool
    {
+      // OK
       let listeident = tableView.identifier
       if (listeident == "taskliste")
       {
-      print ("taskliste shouldSelectRow row: \(row) ")
+      //print ("taskliste shouldSelectRow row: \(row) ")
       }
       else if (listeident == "testliste")
       {
@@ -2069,12 +2091,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       let ident = tableColumn?.identifier
       self.swiftArray[row][ident!] = object
 //      (self.swiftArray[row] as! NSMutableDictionary).setObject(object!, forKey: (tableColumn?.identifier)! as NSCopying)
-      }
-      else if (listeident == "testliste")
-      {
-         let ident = tableColumn?.identifier
-         self.testArray[row][ident!] = object
-
       }
    }
    
@@ -2130,10 +2146,13 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       return nil
    }
-/*
-   func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+
+   /*
+   func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int)
+   {
       let display = swiftArray[row]
-      if tableColumn!.identifier == "displayCell" {
+      if tableColumn!.identifier == "wahl"
+      {
          display.name = object as! String
       }
       else if tableColumn!.identifier == "resolutionCell" {
@@ -2141,7 +2160,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
    }
 */
-   
+ /*
    func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
    {
       if let cell = tableColumn?.dataCell(forRow: row) as? NSCell
@@ -2213,7 +2232,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       return nil
    }
-   
+  */
    /*
    func tableView(_ tableView: NSTableView, dataCellFor tableColumn: NSTableColumn?, row: Int) -> NSCell?
    {
