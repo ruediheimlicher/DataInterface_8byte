@@ -108,7 +108,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    var spistatus:UInt8 = 0;
    var DiagrammFeld:CGRect = CGRect.zero
 
-   
+   var taskArray :[[String:Any]] = [[String:Any]]()
+   var anzahlChannels = 0
    
    var swiftArray = [[String:AnyObject]]()
    
@@ -220,8 +221,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    // Einstellungen
    @IBOutlet  var IntervallPop: NSComboBox!
    @IBOutlet  var ZeitkompressionPop: NSComboBox!
+   @IBOutlet  var Channels_Feld: NSTextField!
+   
    
    @IBOutlet   var TaskListe: NSTableView!
+   
    
 //    @IBOutlet   var TestListe: NSTableView!
    
@@ -486,6 +490,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       TaskListe.dataSource = self
       TaskListe.target = self
       */
+      
+      
       var tempDic = [String:AnyObject]()
       
       tempDic["task"] = 1  as AnyObject?
@@ -506,40 +512,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       tempDic["wahl"] = "I"  as AnyObject?
       swiftArray.append(tempDic)
       
-      
-
-      //MARK: -   TestListe
-      var testDic = [String:AnyObject]()
-      testDic["taskcheck"] = 0  as AnyObject?
-      testDic["description"] = "Strom messen"  as AnyObject?
-      testDic["taskwahl"] = 2  as AnyObject?
-      testArray.append(testDic)
-      
-      testDic["taskcheck"] = 1  as AnyObject?
-      testDic["description"] = "Temperatur messen"  as AnyObject?
-      testDic["taskwahl"] = 1  as AnyObject?
-      
-      testArray.append(testDic)
- /*
-      TestListe.delegate = self
-      TestListe.dataSource = self
-      TestListe.target = self
- */
-      
- var namenpop:NSPopUpButtonCell = NSPopUpButtonCell.init(textCell:"XXX", pullsDown:true)
-      
-      namenpop.removeAllItems()
-      namenpop.addItems(withTitles:["Temperatur","Stromm","Spannung"])
-      let sel:Selector = #selector(DataViewController.tuWasA(_:))
-      namenpop.action = sel
-      namenpop.isEnabled = true
-      namenpop.autoenablesItems = true
-      namenpop.synchronizeTitleAndSelectedItem()
-  //    TaskListe.tableColumn(withIdentifier: "wahl")?.dataCell = namenpop
-
-      // TestListe.reloadData()
-//      self.TestListe.reloadData()
-      
      //MARK: -   datagraph
       var data = datadiagramm.init(nibName: "Datadiagramm", bundle: nil)
       self.datagraph.wantsLayer = true
@@ -554,10 +526,16 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
      
       var tasklist:[String] = ["Temperatur","Strom","Spannung"]
+      
+      var kanaldic:[String:Any] = [:]
+      
+      
       Task_0.removeAllItems()
       Task_0.addItems(withTitles: tasklist)
       Task_0.action = #selector(reportWahlPop(_:))
       Task_0.target = self
+      
+      
       Task_1.removeAllItems()
       Task_1.addItems(withTitles: tasklist)
       Task_1.action = #selector(reportWahlPop(_:))
@@ -571,7 +549,16 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       Task_3.action = #selector(reportWahlPop(_:))
       Task_3.target = self
 
-
+      kanaldic["taskwahl"] = 0
+      kanaldic["taskcheck"] = 0
+      for i in 0..<8
+      {
+        
+         taskArray.append(kanaldic)
+      }
+      taskArray[0]["taskcheck"] = 1
+      anzahlChannels = countChannels()
+      Channels_Feld.intValue  = Int32(anzahlChannels)
    }//viewDidLoad
    // ****************************************************************************
    //MARK: -   newLoggerDataAktion
@@ -888,7 +875,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
          
          //loggerDataArray.append([UInt8(ADC0LO)]);
-         var tempinputDataFeldstring = String(tagsekunde()) + "\t" +  ADCFeld.stringValue
+         var tempinputDataFeldstring = String(tagsekunde()-MessungStartzeit) + "\t" +  ADCFeld.stringValue
          
          // Zeile in inputDataFeld laden
          inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
@@ -897,7 +884,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //   let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
          //    let adc1 = ADC1LO | (ADC1HI<<8)
          let tempzeit = tagsekunde()
-         let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
+         print("MessungStartzeit: \(MessungStartzeit) tempzeit: \(tempzeit)")
+      let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
          
          // datenzeile fuer Diagramm
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
@@ -929,8 +917,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let currentScrollPosition = self.dataScroller.contentView.bounds.origin.x
 
          
- 
-         
          let newscrollorigin = NSMakePoint(currentScrollPosition - CGFloat(lastx),0.0)
          
          
@@ -948,7 +934,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          var rect:CGRect  = self.dataScroller.bounds;
          var scrollToRect:CGRect  = rect.offsetBy(dx: CGFloat(scrollDelta), dy: 0);
 
-         self.dataScroller.documentView?.scrollToVisible(scrollToRect)
+//         self.dataScroller.documentView?.scrollToVisible(scrollToRect)
+
+         
          //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
          // documentView: The view the scroll view scrolls within its content view
          
@@ -1480,8 +1468,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBAction func reportWahlPop(_ sender: AnyObject)
    {
       print("reportWahlPop sender tag: \(sender.tag) ")
+      let index = (sender.tag / 10) - 10
       let zeile = (sender as! NSPopUpButton).indexOfSelectedItem
       print("reportWahlPop sender zeile: \(zeile) ")
+      
+      taskArray[index]["taskwahl"] = zeile
       /*
       let zeile = TaskListe.selectedRow
       var zelle = swiftArray[TaskListe.selectedRow]
@@ -1502,9 +1493,15 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
 
 
-   @IBAction func reportTaskCheck(_ sender: AnyObject)
+   @IBAction func reportTaskCheck(_ sender: NSButton)
    {
-      print("reportTaskCheck state: ")
+      print("reportTaskCheck  sender tag: \(sender.tag) state: \(sender.state)")
+      let index = (sender.tag / 10) - 20
+      taskArray[index]["taskcheck"] = sender.state
+      
+      anzahlChannels = countChannels()
+      Channels_Feld.intValue  = Int32(anzahlChannels)
+      /*
       let zeile = TaskListe.selectedRow
       var zelle = swiftArray[TaskListe.selectedRow] //as! [String:AnyObject]
       print("reportTaskCheck zeile: \(zeile) zelle: \(zelle) task: \(zelle["task"])")
@@ -1521,6 +1518,22 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //zelle["task"] = 0 as AnyObject?
          swiftArray[TaskListe.selectedRow]["task"] = 1  as AnyObject?
       }
+ */
+   }
+   
+   func countChannels() ->Int
+   {
+      var anzahl = 0
+      for zeile in taskArray
+      {
+         let status = zeile["taskcheck"] as! Int
+         if ((zeile["taskcheck"] as! Int) == 1)
+         {
+            anzahl = anzahl + 1
+         }
+      }
+      
+      return anzahl
    }
    
     @IBAction func report_zeitkompression(_ sender: NSComboBox)
@@ -1533,6 +1546,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBAction func report_start_messung(_ sender: NSButton)
    {
       print("start_messung sender: \(sender.state)") // gibt neuen State an
+      if (Channels_Feld.intValue == 0)
+      {
+         print("kein Kanal")
+         return
+      }
       if (sender.state == 1)
       {
          //print("start_messung start ")

@@ -28,6 +28,7 @@
                 <outlet property="ADCFeld" destination="wn3-82-E6R" id="9Ph-Sj-wLS"/>
                 <outlet property="ADCHI_Feld" destination="rxZ-Gl-NZD" id="7Jj-02-jep"/>
                 <outlet property="ADCLO_Feld" destination="NWB-aK-68p" id="Dfy-nb-lmd"/>
+                <outlet property="Channels_Feld" destination="JLc-oL-rbO" id="zSr-ux-b5r"/>
                 <outlet property="Counter" destination="e5h-oK-8HM" id="7XP-3a-1rp"/>
                 <outlet property="DSHI_Feld" destination="hx8-iT-g3e" id="nou-yd-fAK"/>
                 <outlet property="DSLO_Feld" destination="gLt-ZW-TfK" id="m9s-h3-4cB"/>
@@ -1810,7 +1811,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="100" translatesAutoresizingMaskIntoConstraints="NO" id="HNR-mQ-yjo">
-                                            <rect key="frame" x="63" y="296" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="338" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="fLz-Sc-LEI" id="WFY-FY-voc">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1824,16 +1825,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yaJ-n8-ERL">
-                                            <rect key="frame" x="32" y="298" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="200" translatesAutoresizingMaskIntoConstraints="NO" id="yaJ-n8-ERL">
+                                            <rect key="frame" x="32" y="340" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" state="on" inset="2" id="EEw-gF-OWT">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="zoJ-xd-84r"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="110" translatesAutoresizingMaskIntoConstraints="NO" id="CgO-4s-ilI">
-                                            <rect key="frame" x="63" y="272" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="314" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="zcN-dy-rjM" id="PW0-rv-m85">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1847,16 +1851,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0oq-KG-4WS">
-                                            <rect key="frame" x="32" y="274" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="210" translatesAutoresizingMaskIntoConstraints="NO" id="0oq-KG-4WS">
+                                            <rect key="frame" x="32" y="316" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="1bR-iH-DJ4">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="sPe-OG-aE1"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="120" translatesAutoresizingMaskIntoConstraints="NO" id="MHW-3z-LCg">
-                                            <rect key="frame" x="63" y="248" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="290" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="q2P-Cz-B5D" id="i6j-DO-cFV">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1870,16 +1877,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Oh1-EO-gfs">
-                                            <rect key="frame" x="32" y="250" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="220" translatesAutoresizingMaskIntoConstraints="NO" id="Oh1-EO-gfs">
+                                            <rect key="frame" x="32" y="292" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="EwS-c1-DbX">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="l5a-B7-Hzu"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="130" translatesAutoresizingMaskIntoConstraints="NO" id="olc-XJ-LG0">
-                                            <rect key="frame" x="63" y="224" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="266" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="277-oW-i1W" id="9br-aY-Gc5">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1893,16 +1903,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5qR-Va-7qF">
-                                            <rect key="frame" x="32" y="226" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="230" translatesAutoresizingMaskIntoConstraints="NO" id="5qR-Va-7qF">
+                                            <rect key="frame" x="32" y="268" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="HRC-wk-tzi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="Lor-nu-6jV"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="140" translatesAutoresizingMaskIntoConstraints="NO" id="Btc-qc-EFf">
-                                            <rect key="frame" x="63" y="200" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="242" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ufR-2f-86r" id="ioa-Cf-3fj">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1916,16 +1929,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wdw-Ol-JVZ">
-                                            <rect key="frame" x="32" y="202" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="240" translatesAutoresizingMaskIntoConstraints="NO" id="Wdw-Ol-JVZ">
+                                            <rect key="frame" x="32" y="244" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="abp-NK-csF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="cM9-98-6wr"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="150" translatesAutoresizingMaskIntoConstraints="NO" id="j2i-a2-1zV">
-                                            <rect key="frame" x="63" y="176" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="218" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JXd-yF-MZd" id="SDR-xX-q0d">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1939,16 +1955,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r9M-R4-hjr">
-                                            <rect key="frame" x="32" y="178" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="250" translatesAutoresizingMaskIntoConstraints="NO" id="r9M-R4-hjr">
+                                            <rect key="frame" x="32" y="220" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="j0k-yL-RHy">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="OES-Xs-a6S"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="170" translatesAutoresizingMaskIntoConstraints="NO" id="Kaf-T4-fee">
-                                            <rect key="frame" x="63" y="130" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="172" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="FW9-if-acx" id="LS7-HY-ssz">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1962,16 +1981,19 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bQV-Io-YXd">
-                                            <rect key="frame" x="32" y="154" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="260" translatesAutoresizingMaskIntoConstraints="NO" id="bQV-Io-YXd">
+                                            <rect key="frame" x="32" y="196" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="zBm-KY-ngs">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="dWp-Om-Wbg"/>
+                                            </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" tag="160" translatesAutoresizingMaskIntoConstraints="NO" id="9OE-f7-Txy">
-                                            <rect key="frame" x="63" y="153" width="154" height="22"/>
+                                            <rect key="frame" x="63" y="195" width="154" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="j2F-Gk-sAT" id="Q3d-3m-ELM">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1985,14 +2007,35 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
-                                        <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9EO-i9-E4k">
-                                            <rect key="frame" x="32" y="130" width="25" height="20"/>
+                                        <button fixedFrame="YES" tag="270" translatesAutoresizingMaskIntoConstraints="NO" id="9EO-i9-E4k">
+                                            <rect key="frame" x="32" y="172" width="25" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" controlSize="small" inset="2" id="0ga-ht-kid">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="reportTaskCheck:" target="9Ve-yB-YH6" id="hjy-g3-jEQ"/>
+                                            </connections>
                                         </button>
+                                        <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JLc-oL-rbO">
+                                            <rect key="frame" x="181" y="145" width="33" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1" drawsBackground="YES" id="Vxw-no-q6Q">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mqa-8X-LQU">
+                                            <rect key="frame" x="70" y="147" width="94" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Anzahl Kanäle:" id="DvW-e8-mcD">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
