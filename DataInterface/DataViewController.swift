@@ -110,7 +110,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
    var taskArray :[[String:Any]] = [[String:Any]]()
    var anzahlChannels = 0
-   
+    var anzahlStoreChannels = 1
    var swiftArray = [[String:AnyObject]]()
    
    var testArray = [[String:AnyObject]]()
@@ -223,6 +223,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var ZeitkompressionPop: NSComboBox!
    @IBOutlet  var Channels_Feld: NSTextField!
    
+   @IBOutlet  var storeChannels_Feld: NSTextField!
+   @IBOutlet  var storeChannels_Stepper: NSStepper!
+   @IBOutlet  var storeChannels_Pop: NSPopUpButton!
+
    
    @IBOutlet   var TaskListe: NSTableView!
    
@@ -551,9 +555,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
       kanaldic["taskwahl"] = 0
       kanaldic["taskcheck"] = 0
-      for i in 0..<8
+      for _ in 0..<8
       {
-        
          taskArray.append(kanaldic)
       }
       taskArray[0]["taskcheck"] = 1
@@ -875,24 +878,43 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
          
          //loggerDataArray.append([UInt8(ADC0LO)]);
-         var tempinputDataFeldstring = String(tagsekunde()-MessungStartzeit) + "\t" +  ADCFeld.stringValue
+         var tempinputDataFeldstring = String(tagsekunde()-MessungStartzeit) + "\t" //+  ADCFeld.stringValue
          
-         // Zeile in inputDataFeld laden
-         inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
          
          //   let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
          //   let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
          //    let adc1 = ADC1LO | (ADC1HI<<8)
          let tempzeit = tagsekunde()
          print("MessungStartzeit: \(MessungStartzeit) tempzeit: \(tempzeit)")
-      let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
+         let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
          
          // datenzeile fuer Diagramm
+         
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
          tempwerte[0] = Float(tempzeit) // Abszisse
+         var kanalindex = 1 // Index des zu speichernden Kanals
+         
+         for storeindex in 0..<8
+         {
+             print("storeindex: \(storeindex) taskArray: \(taskArray[storeindex])")
+            if ((taskArray[storeindex]["taskcheck"] as! Int) > 0)
+            {
+               print("kanalindex: \(kanalindex)")
+               tempwerte[kanalindex] = Float(adcfloat)
+               tempinputDataFeldstring = tempinputDataFeldstring + "\t" + ADCFeld.stringValue
+               kanalindex = kanalindex + 1
+            }
+         }
+         
+         // Zeile in inputDataFeld laden
+         inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
+
+         
+         
+         
          tempwerte[1] = Float(adcfloat)
          
-         tempwerte[3] = Float(adcfloat + 10)
+         //tempwerte[3] = Float(adcfloat + 10)
          
          //print("tempwerte: \(tempwerte)")
          DiagrammDataArray.append(tempwerte)
@@ -1491,7 +1513,15 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    }
    
    
-
+   @IBAction func reportChannelPop(_ sender: AnyObject)
+   {
+      //print("reportChannelPop sender tag: \(sender.tag!) ")
+      let index = (sender.tag / 10) - 10
+      let zeile = (sender as! NSPopUpButton).indexOfSelectedItem
+      let channeltag = ((sender as! NSPopUpButton).selectedItem?.tag)! - 400
+      anzahlStoreChannels = channeltag
+      print("reportChannelPop sender zeile: \(zeile) tag: \(channeltag)")
+   }
 
    @IBAction func reportTaskCheck(_ sender: NSButton)
    {
@@ -1657,7 +1687,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let intervall = IntervallPop.integerValue
          //let startblock = write_sd_startblock.integerValue
          
-         var kopfstring = prefix + "\n" + "startzeit\t\(MessungStartzeit)\tintervall\t\(intervall)\tstartblock\t\(startblock)\n"
+         var kopfstring = prefix + "\n" + "startzeit\t\(MessungStartzeit)\tintervall\t\(intervall)\tstartblock\t\(startblock)\nKanäle: \t\(anzahlChannels)"
          
          messungstring = kopfstring + messungstring
          
