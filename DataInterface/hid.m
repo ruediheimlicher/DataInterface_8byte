@@ -499,7 +499,9 @@ void output_callback(void *context, IOReturn ret, void *sender,
 	if (ret == kIOReturnSuccess)
    {
 		*(int *)context = len;
-	} else {
+	}
+   else
+   {
 		// timeout if not success?
 		*(int *)context = 0;
 	}
