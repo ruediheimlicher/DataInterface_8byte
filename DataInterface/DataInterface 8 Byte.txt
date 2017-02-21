@@ -10,3 +10,40 @@
 //  License	<#license#>
 //
 
+ADC 0 lo
+ADC 0 hi
+ADC 1 lo
+ADC 1 hi
+
+ADC 12bit lo
+ADC 12bit hi
+ADC 12bit lo
+ADC 12bit hi
+ADC 12bit lo
+ADC 12bit hi
+ADC 12bit lo
+ADC 12bit hi
+
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+Digi Ausgang
+
+Digi Eingang
+Digi Eingang
+Digi Eingang
+Digi Eingang
+Digi Eingang
+Digi Eingang
+Digi Eingang
+Digi Eingang
+
+
+
+
+
+*/

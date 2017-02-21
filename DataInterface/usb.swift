@@ -172,7 +172,7 @@ open class usb_teensy: NSObject
       let result = rawhid_recv(0, &read_byteArray, Int32(BUFFER_SIZE), 50);
       
       print("*report_start_read_USB result: \(result)")
-      print("usb.swift start_read_byteArray start: *\n\(read_byteArray)*")
+      //print("usb.swift start_read_byteArray start: *\n\(read_byteArray)*")
       
       // var somethingToPass = "It worked in teensy_send_USB"
       let xcont = true;
@@ -250,6 +250,7 @@ open class usb_teensy: NSObject
       }
       else
       {
+         print("*cont_read_USB read_OK: \(read_OK)")
          timer.invalidate()
       }
    }
