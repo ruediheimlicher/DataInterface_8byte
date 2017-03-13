@@ -20,12 +20,69 @@ let DSLO = 8
 let DSHI = 9
 
 // ADC
-let  ADC0LO      =      16
-let  ADC0HI      =      17
+//let  ADC0LO      =      16
+//let  ADC0HI      =      17
 // ADC 2
-let  ADC1LO      =       18
-let  ADC1HI      =       19
+//let  ADC1LO      =       18
+//let  ADC1HI      =       19
 
+// neue defines
+//Datenpaket USB:
+//PACKET_SIZE 32 // Bytes
+
+// teensy
+//ADC
+let ADC0LO = 16	// ADC 0 lo
+let ADC0HI = 17	// ADC 0 hi
+let ADC1LO = 18	// ADC 1 lo
+let ADC1HI = 19	// ADC 1 hi
+
+//MC3204 12Bit
+let ADC12_0_LO = 20  // ADC 12bit lo
+let ADC12_0_HI	= 21  // ADC 12bit hi
+let ADC12_1_LO	= 22 // ADC 12bit lo
+let ADC12_1_HI	= 23 // ADC 12bit hi
+let ADC12_2_LO	= 24 // ADC 12bit lo
+let ADC12_2_HI	= 25 // ADC 12bit hi
+let ADC12_3_LO	= 26 // ADC 12bit lo
+let ADC12_3_HI	= 27 // ADC 12bit hi
+
+// Digi
+let DIGI0 = 28 	// Digi Eingang
+let DIGI1 = 29	// Digi Eingang
+let DIGI2 = 30	// Digi Eingang
+let DIGI3 = 31	// Digi Eingang
+
+
+// Satellit
+
+// ADC
+let EXTADC0LO = 32	// ADC 0 lo
+let EXTADC0HI = 33	// ADC 0 hi
+let EXTADC1LO = 34	// ADC 1 lo
+let EXTADC1HI = 35	// ADC 1 hi
+
+//MC3204 12Bit
+
+let EXTADC12_0_LO	= 36    // ADC 12bit lo
+let EXTADC12_0_HI	= 37        // ADC 12bit hi
+let EXTADC12_1_LO	= 38       // ADC 12bit lo
+let EXTADC12_1_HI	= 39        // ADC 12bit hi
+let EXTADC12_2_LO	= 40        // ADC 12bit lo
+let EXTADC12_2_HI	= 41        // ADC 12bit hi
+let EXTADC12_3_LO	= 42        // ADC 12bit lo
+let EXTADC12_3_HI	= 43        // ADC 12bit hi
+
+// Digi
+
+let EXTDIGI0 = 44  // Digi Eingang
+let EXTDIGI1 = 45	 // Digi Eingang
+let EXTDIGI2 = 46	 // Digi Eingang
+let EXTDIGI3 = 47	 // Digi Eingang
+
+
+
+// end neue defines
 
 // USB Ausgang
 let SERVOALO = 10
@@ -895,7 +952,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          // Temperatur
 
          
-         var  adc0float:Float = Float(adc0) * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
+         var  adc0float:Float = Float(adc0) // * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
          // print ("adc0float: \(adc0float)");
          
          let a0lo = String(format:"%2X", teensy.read_byteArray[ADC0LO])
@@ -912,7 +969,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //var adc0anzeige = Float(roundit(Double(adc0float), toNearest: 0.5))
          
          
-         //adc0float /= 2.0
+         adc0float /= 10.0
  
          adcfloatarray[0]  = adc0float
          
@@ -938,7 +995,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          // print ("adc0: \(adc0)");
          
-         var  adc1float:Float = Float(adc1) * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
+         var  adc1float:Float = Float(adc1) // * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
           //print ("adc1float: \(adc1float)");
          
 //         print("adc1lo: \(adc1lo) adc1hi: \(adc1hi) adc1: \(adc1) adc1float: \(adc1float)");
@@ -946,7 +1003,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
          
          //adc1float = (adc1float * Float(2))
-         adc1float = adc1float * 2.0
+     //    adc1float = adc1float //* 2.0
          
          
          
@@ -955,8 +1012,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
  wert bei 20°: 190
           Diff zu 190 anzeigen, Offset 30
  */
-         adc1float = (adc1float - 150.0)/4.0
+ //        adc1float = (adc1float)/4.0
          
+         // PT10000
+          //adc1float -= 100
          var adc1anzeige = Float(roundit(Double(adc1float), toNearest: 0.5))
 
          
