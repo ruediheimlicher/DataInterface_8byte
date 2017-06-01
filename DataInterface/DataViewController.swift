@@ -568,7 +568,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       TaskListe.dataSource = self
       TaskListe.target = self
       */
-      
+      IntervallPop.selectItem(at:0)
       
       var tempDic = [String:AnyObject]()
       
@@ -636,6 +636,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       taskArray[0]["taskcheck"] = 1 // Ein kanal ist immer aktiviert
      
       taskArray[1]["taskcheck"] = 1 // Ein kanal ist immer aktiviert
+      taskArray[2]["taskcheck"] = 1 // Ein kanal ist immer aktiviert
 
       anzahlChannels = countChannels() // Anzahl aktivierte kanaele
       Channels_Feld.intValue  = Int32(anzahlChannels)
@@ -935,25 +936,27 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //print("ADC0LO: \(teensy.read_byteArray[ADC0LO]) ADC0HI: \(teensy.read_byteArray[ADC0HI])");
 
          
-         let adc0lo:Int32 =  Int32(teensy.read_byteArray[ADC0LO])
-         let adc0hi:Int32 =  Int32(teensy.read_byteArray[ADC0HI])
+         let adc0lo:Int32 =  Int32(teensy.read_byteArray[EXTADC12_0_LO])
+         let adc0hi:Int32 =  Int32(teensy.read_byteArray[EXTADC12_0_HI])
          
          
          let adc0 = adc0lo | (adc0hi<<8)
          
+         print ("adc0lo: \(adc0lo) adc0hi: \(adc0hi)  adc0: \(adc0)");
+
          
          // print ("ADC0LO: \(ADC0LO) ADC0HI: \(ADC0HI)  adc0: \(adc0)");
          
-         // print ("adc0: \(adc0)");
-         ADC0LO_Feld.intValue = Int32(teensy.read_byteArray[ADC0LO])
-         ADC0HI_Feld.intValue = Int32(teensy.read_byteArray[ADC0HI])
+          print ("adc0: \(adc0)");
+         ADC0LO_Feld.intValue = Int32(teensy.read_byteArray[EXTADC12_0_LO])
+         ADC0HI_Feld.intValue = Int32(teensy.read_byteArray[EXTADC12_0_HI])
          
          
          // Temperatur
 
          
          var  adc0float:Float = Float(adc0) // * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
-         // print ("adc0float: \(adc0float)");
+          print ("adc0float: \(adc0float)");
          
          let a0lo = String(format:"%2X", teensy.read_byteArray[ADC0LO])
          let a0hi = String(format:"%2X", teensy.read_byteArray[ADC0HI])
@@ -966,10 +969,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          adc0float = floorf(fabs(adc0float)*2.f) / 2.f
          
+         print ("adc0float 2: \(adc0float)");
          //var adc0anzeige = Float(roundit(Double(adc0float), toNearest: 0.5))
          
          
-         adc0float /= 10.0
+ //        adc0float /= 10.0
  
          adcfloatarray[0]  = adc0float
          
@@ -979,8 +983,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          //print("ADC1LO: \(teensy.read_byteArray[ADC1LO]) ADC1HI: \(teensy.read_byteArray[ADC1HI])");
 
-         let adc1lo:Int32 =  Int32(teensy.read_byteArray[ADC1LO])
-         let adc1hi:Int32 =  Int32(teensy.read_byteArray[ADC1HI])
+         let adc1lo:Int32 =  Int32(teensy.read_byteArray[EXTADC12_1_LO])
+         let adc1hi:Int32 =  Int32(teensy.read_byteArray[EXTADC12_1_HI])
          
          ADC1LO_Feld.intValue = Int32(teensy.read_byteArray[ADC1LO])
          ADC1HI_Feld.intValue = Int32(teensy.read_byteArray[ADC1HI])
@@ -997,16 +1001,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          var  adc1float:Float = Float(adc1) // * TEENSYVREF / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
           //print ("adc1float: \(adc1float)");
-         
-//         print("adc1lo: \(adc1lo) adc1hi: \(adc1hi) adc1: \(adc1) adc1float: \(adc1float)");
-//         print("adc1: \t\(adc1) \tadc1float: \t\(adc1float)");
-
-         
-         //adc1float = (adc1float * Float(2))
-     //    adc1float = adc1float //* 2.0
-         
-         
-         
          
          /*
  wert bei 20°: 190
@@ -1027,10 +1021,30 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //print("adc1: \t\(adc1) \t adc1float: \t\(adc1float) \t adc1anzeige: \t\(adc1anzeige) ");
          
          adcfloatarray[1] =  adc1float
-         
+         print("adc1float: \(adc1float) )");
          
          //
          adc1float = adc1anzeige
+         
+         
+         
+         
+         let adc2lo:Int32 =  Int32(teensy.read_byteArray[EXTADC12_2_LO])
+         let adc2hi:Int32 =  Int32(teensy.read_byteArray[EXTADC12_2_HI])
+         let adc2 = adc2lo | (adc2hi<<8)
+         var  adc2float:Float = Float(adc2)
+         
+         adc2float = adc2float * 2.56 / 1023
+         
+         adc2float *= 20 // Anzeigewert anpassen
+         
+         let tempbatteriespannung = Int32(teensy.read_byteArray[EXTADC1LO])
+         adc2float = Float(tempbatteriespannung)
+         
+         print("adc2float: \(adc2float) )");
+         
+          adcfloatarray[2] =  adc2float
+         
          //
          //print("adc1float: \(adc1float) )");
          
@@ -1054,9 +1068,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //    let adc1 = ADC1LO | (ADC1HI<<8)
          let tempzeit = tagsekunde()
          //print("MessungStartzeit: \(MessungStartzeit) tempzeit: \(tempzeit)")
-         let data0zeile:[Float] = [Float(tempzeit),Float(adc0float),Float(adc1float)]
+         let data0zeile:[Float] = [Float(tempzeit),Float(adc0float),Float(adc1float),Float(adc2float)]
          
-      //   print ("datazeile \(data0zeile)\n")
+      
+         
+         //   print ("datazeile \(data0zeile)\n")
          // datenzeile fuer Diagramm
          
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
@@ -1161,7 +1177,13 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             self.dataScroller.contentView.needsDisplay = true
          }
          
+         if (lastx > Float((self.dataScroller.documentView?.frame.size.width)! * 0.9))
+         {
+           // self.dataScroller.documentView?.frame.size.width += 1000
+         }
          
+         let batteriespannung = Int32(teensy.read_byteArray[EXTADC1LO])
+         print("batteriespannung: \(batteriespannung)")
          // end data
          
          // ****************************************************************************
@@ -1790,6 +1812,49 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          {
             zeile = 0
          }
+         
+         /* 
+          // aus reportTaskIntervall
+          let wahl = sender.objectValueOfSelectedItem! as! String
+          let index = sender.indexOfSelectedItem
+          // print("reportTaskIntervall wahl: \(wahl) index: \(index)")
+          // http://stackoverflow.com/questions/24115141/swift-converting-string-to-int
+          let integerwahl:UInt16? = UInt16(wahl)
+          print("reportTaskIntervall integerwahl: \(integerwahl!)")
+          
+          if let integerwahl = UInt16(wahl)
+          {
+          print("By optional binding :", integerwahl) // 20
+          }
+          
+          //et num:Int? = Int(firstTextField.text!);
+          // Taktintervall in array einsetzen
+          teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(integerwahl! & 0x00FF)
+          teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((integerwahl! & 0xFF00)>>8)
+          //    print("reportTaskIntervall teensy.write_byteArray[TAKT_LO_BYTE]: \(teensy.write_byteArray[TAKT_LO_BYTE])")
+
+ */
+         
+         // Intervall einsetzen
+         var index = IntervallPop.indexOfSelectedItem
+         //
+         if (index < 0)
+         {
+            index = 0
+            IntervallPop.selectItem(at:index)
+         }
+         let wahl = IntervallPop.objectValueOfSelectedItem as! String
+         print("reportTaskIntervall wahl: \(wahl) index: \(index)")
+         
+         let integerwahl:UInt16? = UInt16(wahl)
+         print("report_start_messung integerwahl: \(integerwahl!)")
+         // Taktintervall in array einsetzen
+         teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(integerwahl! & 0x00FF)
+         teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((integerwahl! & 0xFF00)>>8)
+
+         
+         
+         
          MessungStartzeitFeld.integerValue = tagsekunde()
          MessungStartzeit = tagsekunde()
          
@@ -1817,7 +1882,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let startminute = tagminute()
          teensy.write_byteArray[STARTMINUTELO_BYTE] = UInt8(startminute & 0x00FF)
          teensy.write_byteArray[STARTMINUTEHI_BYTE] = UInt8((startminute & 0xFF00)>>8)
-         print("\nreport start messungT: teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
+ //        print("\nreport start messungT: teensy.last_read_byteArray: \(teensy.last_read_byteArray)")
+         print("\nreport start messungT: teensy.write_byteArray: \(teensy.write_byteArray)")
 
          delayWithSeconds(1)
          {
@@ -1826,7 +1892,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             
             self.datagraph.initGraphArray()
             self.datagraph.setStartsekunde(startsekunde:self.tagsekunde())
-            self.datagraph.setMaxY(maxY: 100)
+            self.datagraph.setMaxY(maxY: 150)
             self.datagraph.setDisplayRect()
             
             self.usb_read_cont = (self.cont_read_check.state == 1) // cont_Read wird bei aktiviertem check eingeschaltet
@@ -2054,7 +2120,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       self.datagraph.initGraphArray()
       self.datagraph.setStartsekunde(startsekunde:tagsekunde())
-      self.datagraph.setMaxY(maxY: 100)
+      self.datagraph.setMaxY(maxY: 180)
       self.datagraph.setDisplayRect()
       
       
@@ -2202,7 +2268,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                print("reportOpenData loggerdataArray\n\(loggerDataArray)\n")
                self.datagraph.initGraphArray()
                //self.datagraph.setStartsekunde(startsekunde:self.tagsekunde())
-               self.datagraph.setMaxY(maxY: 100)
+               self.datagraph.setMaxY(maxY: 150)
           //     self.datagraph.setDisplayRect()
 
                var index = 0

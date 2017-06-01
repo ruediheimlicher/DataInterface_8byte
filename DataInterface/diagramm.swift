@@ -45,9 +45,10 @@ class DataPlot: NSView
    
    fileprivate struct   Vorgaben
    {
-      static var MajorTeileY: Int = 10                           // Teile der Hauptskala
+      
+      static var MajorTeileY: Int = 16                           // Teile der Hauptskala
       static var MinorTeileY: Int = 2                             // Teile der Subskala
-      static var MaxY: CGFloat = 100.0                            // Obere Grenze der Anzeige
+      static var MaxY: CGFloat = 160.0                            // Obere Grenze der Anzeige
       static var MinY: CGFloat = 0.0                              // Untere Grenze der Anzeige
       static var MaxX: CGFloat = 1000                             // Obere Grenze der Abszisse
 
@@ -65,7 +66,7 @@ class DataPlot: NSView
       
       
       static let majorrasterhorizontal = 50 // Sprung innerhalb Zeitachse
-static let minorrasterhorizontal = 10
+      static let minorrasterhorizontal = 10
    }
    
    
@@ -210,14 +211,48 @@ static let minorrasterhorizontal = 10
  
    open func setVorgaben(vorgaben:[String:Float])
    {
+      /*
+       static var MajorTeileY: Int = 16                           // Teile der Hauptskala
+       static var MinorTeileY: Int = 2                             // Teile der Subskala
+       static var MaxY: CGFloat = 160.0                            // Obere Grenze der Anzeige
+       static var MinY: CGFloat = 0.0                              // Untere Grenze der Anzeige
+       static var MaxX: CGFloat = 1000                             // Obere Grenze der Abszisse
+       
+       static var ZeitKompression: CGFloat = 1.0
+       static var Startsekunde: Int = 0
+       static let NullpunktY: CGFloat = 0.0
+       static let NullpunktX: CGFloat = 0.0
+       static let DiagrammEcke: CGPoint = CGPoint(x:15, y:10)// Ecke des Diagramms im View
+       static let DiagrammeckeY: CGFloat = 0.0 //
+       static let StartwertX: CGFloat = 0.0 // Abszisse des ersten Wertew
+       // static let StartwertY: CGFloat = 0.0
+       
+       // Achsen
+       static let rastervertikal = 2 // Sprung innerhalb MajorTeileY + MinorTeileY
+       
+       
+       static let majorrasterhorizontal = 50 // Sprung innerhalb Zeitachse
+       static let minorrasterhorizontal = 10
+
+       */
       if (vorgaben["zeitkompression"] != nil)
       {
          Vorgaben.ZeitKompression = CGFloat(vorgaben["zeitkompression"]!)
       }
-       if (vorgaben["MajorTeileY"] != nil)
-       {
+      if (vorgaben["MajorTeileY"] != nil)
+      {
          Vorgaben.MajorTeileY = Int((vorgaben["MajorTeileY"])!)
       }
+
+      if (vorgaben["MajorTeileY"] != nil)
+      {
+         Vorgaben.MajorTeileY = Int((vorgaben["MajorTeileY"])!)
+      }
+      
+      
+      
+      
+
       needsDisplay = true
    }
    
